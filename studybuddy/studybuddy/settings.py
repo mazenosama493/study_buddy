@@ -138,4 +138,6 @@ LOGOUT_REDIRECT_URL = 'login'
 
 
 AUTH_USER_MODEL = 'users.CustomUser'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 

@@ -1,10 +1,90 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        .hidden { display: none; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h2>Register</h2>
+    
+    {% if form.errors %}
+        <div class="error">
+            <strong>Form submission failed. Please correct the errors below:</strong>
+            <ul>
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 
-{% block content %}
-<h2>Register</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Sign Up</button>
-</form>
-{% endblock %}
+    <form method="post" id="register-form">
+        {% csrf_token %}
+
+        <label for="id_username">Username:</label>
+        {{ form.username }}
+
+        <label for="id_email">Email:</label>
+        {{ form.email }}
+
+        <label for="id_password1">Password:</label>
+        {{ form.password1 }}
+
+        <label for="id_password2">Confirm Password:</label>
+        {{ form.password2 }}
+
+        <label for="id_role">Role:</label>
+        {{ form.role }}
+
+        <!-- Subject Selection (Only for Teachers) -->
+        <div id="subject-field" class="hidden">
+            <label for="id_subject_category">Select Subject (For Teachers Only):</label>
+            {{ form.subject_category }}
+        </div>
+
+        <!-- Grade Selection (Only for Students) -->
+        <div id="grade-field" class="hidden">
+            <label for="id_grade_level">Select Grade (For Students Only):</label>
+            {{ form.grade_level }}
+        </div>
+
+        <label for="id_profile_picture">Profile Picture:</label>
+        {{ form.profile_picture }}
+
+        <button type="submit" id="register-btn">Register</button>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var roleField = document.querySelector("#id_role");
+            var subjectField = document.querySelector("#subject-field");
+            var gradeField = document.querySelector("#grade-field");
+            var registerForm = document.querySelector("#register-form");
+            var registerButton = document.querySelector("#register-btn");
+
+            function toggleFields() {
+                if (roleField.value === "teacher") {
+                    subjectField.classList.remove("hidden");
+                    gradeField.classList.add("hidden");
+                } else if (roleField.value === "student") {
+                    subjectField.classList.add("hidden");
+                    gradeField.classList.remove("hidden");
+                } else {
+                    subjectField.classList.add("hidden");
+                    gradeField.classList.add("hidden");
+                }
+            }
+
+            roleField.addEventListener("change", toggleFields);
+            toggleFields(); // Run once when the page loads
+        });
+    </script>
+</body>
+</html>
