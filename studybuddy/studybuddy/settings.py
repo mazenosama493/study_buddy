@@ -40,8 +40,16 @@ INSTALLED_APPS = [
 
     # Custom Apps
     'users',
+    'rest_framework',
+    'rest_framework.authtoken',
 
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -138,6 +146,6 @@ LOGOUT_REDIRECT_URL = 'login'
 
 
 AUTH_USER_MODEL = 'users.CustomUser'
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 
 
