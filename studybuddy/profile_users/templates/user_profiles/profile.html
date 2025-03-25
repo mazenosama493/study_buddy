@@ -3,28 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
+    <title>{{ request.user.username }}'s Profile</title>
 </head>
 <body>
-    <h2>{{ profile.user.username }}'s Profile</h2>
+    <h2>{{ request.user.username }}'s Profile</h2>
 
-    <!-- Display Profile Picture -->
-    {% if profile.profile_picture %}
-        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" width="150">
+    <!-- Profile Picture -->
+    {% if request.user.profile_picture %}
+        <img src="{{ request.user.profile_picture.url }}" alt="Profile Picture" width="150">
     {% else %}
         <p>No profile picture uploaded.</p>
     {% endif %}
 
     <!-- Display Bio -->
-    <p><strong>Bio:</strong> {{ profile.bio }}</p>
+    <p><strong>Bio:</strong> {{ request.user.bio }}</p>
 
-    <!-- Navigation Buttons -->
+    <!-- Edit Profile Button -->
     <a href="{% url 'edit_profile' %}">
         <button>Edit Profile</button>
-    </a>
-
-    <a href="{% url 'notes_list' %}">
-        <button>Go to Notes</button>
     </a>
 
     <!-- User's Notes Section -->
@@ -32,17 +28,23 @@
     <ul>
         {% for note in notes %}
             <li>
-                <a href="{% url 'note_detail' note.id %}">{{ note.title }}</a> 
-                (Grade: {{ note.grade_level }}, Subject: {{ note.subject }})
+                <h3>{{ note.title }}</h3>
+                <p><strong>Grade:</strong> {{ note.grade_level }} | <strong>Subject:</strong> {{ note.subject }}</p>
+                
+                <!-- Note Content -->
+                <p>{{ note.content }}</p>
+
+                <!-- File Download Option -->
+                {% if note.file %}
+                    <p><a href="{{ note.file.url }}" download><button>📥 Download Attachment</button></a></p>
+                {% endif %}
             </li>
         {% empty %}
             <p>You haven't created any notes yet.</p>
         {% endfor %}
     </ul>
 
-    <!-- Logout Button -->
-    <a href="{% url 'logout' %}">
-        <button>Logout</button>
-    </a>
+    <!-- Back to Notes -->
+    <a href="{% url 'notes_list' %}"><button>Go to Notes</button></a>
 </body>
 </html>

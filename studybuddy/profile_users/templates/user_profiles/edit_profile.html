@@ -10,10 +10,16 @@
 
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        <label for="id_bio">Bio:</label>
+        {{ profile_form.bio }}
+
+        <label for="id_profile_picture">Profile Picture:</label>
+        {{ picture_form.profile_picture }}
+
         <button type="submit">Save Changes</button>
     </form>
 
-    <a href="{% url 'profile_view' %}">Back to Profile</a>
+    <a href="{% url 'profile_view' %}"><button>Cancel</button></a>
 </body>
 </html>

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Profile
-from .forms import ProfileForm
+from .forms import ProfileForm, UserEditForm
 from notes import models
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -28,17 +28,27 @@ def profile_view(request):
     notes = request.user.note_set.all()
     return render(request, 'user_profiles/profile.html', {'profile': profile, 'notes': notes})
 
+
 @login_required
 def edit_profile(request):
-    """ Allow user to edit profile details """
+    """ Allow user to edit profile details and update profile picture """
     profile = Profile.objects.get(user=request.user)
+    user = request.user
 
     if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            return redirect('profile_view')
-    else:
-        form = ProfileForm(instance=profile)
+        profile_form = ProfileForm(request.POST, instance=profile)
+        picture_form = UserEditForm(request.POST, request.FILES, instance=user)
 
-    return render(request, 'user_profiles/edit_profile.html', {'form': form})
+        if profile_form.is_valid() and picture_form.is_valid():
+            profile_form.save()
+            picture_form.save()
+            return redirect('profile_view')  # ✅ Redirect to profile after saving
+
+    else:
+        profile_form = ProfileForm(instance=profile)
+        picture_form = UserEditForm(instance=user)
+
+    return render(request, 'user_profiles/edit_profile.html', {
+        'profile_form': profile_form,
+        'picture_form': picture_form
+    })
