@@ -17,10 +17,3 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class CustomTokenRefreshView(TokenRefreshView):
     pass  # Uses the default behavior
 
-# Get User Profile (Authenticated Users Only)
-class UserProfileView(generics.RetrieveAPIView):
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user

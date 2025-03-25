@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ note.title }}</title>
+    <style>
+        .comment { margin-left: 20px; }
+        .reply { margin-left: 40px; }
+    </style>
+</head>
+<body>
+    <h2>{{ note.title }}</h2>
+    <p>{{ note.content }}</p>
+
+    {% if note.file %}
+        <p>Attached File: <a href="{{ note.file.url }}" download>Download</a></p>
+    {% endif %}
+
+    <p>Author: {{ note.author.username }}</p>
+    <p>Public: {{ note.is_public }}</p>
+
+    <form method="POST" action="{% url 'like_note' note.id %}">
+        {% csrf_token %}
+        <button type="submit">Like ({{ note.likes.count }})</button>
+    </form>
+
+    <form method="POST" action="{% url 'dislike_note' note.id %}">
+        {% csrf_token %}
+        <button type="submit">Dislike ({{ note.dislikes.count }})</button>
+    </form>
+
+    <h3>Comments</h3>
+    <form method="POST" action="{% url 'add_comment' note.id %}">
+        {% csrf_token %}
+        <textarea name="content" required></textarea>
+        <button type="submit">Add Comment</button>
+    </form>
+
+    <ul>
+        {% for comment in note.comments.all %}
+            <li class="comment">
+                <strong>{{ comment.user.username }}</strong>: {{ comment.content }}
+                <form method="POST" action="{% url 'add_comment' note.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                    <textarea name="content" placeholder="Reply..." required></textarea>
+                    <button type="submit">Reply</button>
+                </form>
+
+                {% for reply in comment.replies.all %}
+                    <ul class="reply">
+                        <li><strong>{{ reply.user.username }}</strong>: {{ reply.content }}</li>
+                    </ul>
+                {% endfor %}
+            </li>
+        {% empty %}
+            <p>No comments yet.</p>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'notes_list' %}">Back to Notes</a>
+</body>
+</html>

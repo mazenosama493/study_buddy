@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
@@ -33,7 +34,7 @@ class CustomUser(AbstractUser):
     grade_level = models.CharField(max_length=20, choices=GRADE_LEVELS, blank=True, null=True)
     email = models.EmailField(unique=True)
     bio = models.TextField(blank=True, null=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
 
     def clean(self):

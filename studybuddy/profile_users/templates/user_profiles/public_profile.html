@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile.user.username }}'s Profile</title>
+</head>
+<body>
+    <h2>{{ profile.user.username }}'s Profile</h2>
+
+    <!-- Display Profile Picture -->
+    {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" width="150">
+    {% else %}
+        <p>No profile picture uploaded.</p>
+    {% endif %}
+
+    <!-- Display Bio -->
+    <p><strong>Bio:</strong> {{ profile.bio }}</p>
+
+    <!-- Public Notes Section -->
+    <h3>Public Notes</h3>
+    <ul>
+        {% for note in notes %}
+            <li>
+                <a href="{% url 'note_detail' note.id %}">{{ note.title }}</a> 
+                (Grade: {{ note.grade_level }}, Subject: {{ note.subject }})
+            </li>
+        {% empty %}
+            <p>No public notes available.</p>
+        {% endfor %}
+    </ul>
+
+    <!-- Back to Notes -->
+    <a href="{% url 'notes_list' %}">
+        <button>Go to Notes</button>
+    </a>
+</body>
+</html>

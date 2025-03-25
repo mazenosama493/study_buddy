@@ -30,6 +30,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
     path('', redirect_to_login, name='home'),
+    path('notes/', include('notes.urls')),
+    path('profile/', include('profile_users.urls')),
+
 ]
 
 if settings.DEBUG:

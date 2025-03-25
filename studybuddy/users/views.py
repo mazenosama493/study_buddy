@@ -7,9 +7,6 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
-@login_required
-def profile(request):
-    return render(request, 'users/profile.html', {'user': request.user})
 
 def logout_view(request):
     logout(request)
@@ -18,10 +15,9 @@ def logout_view(request):
 
 def register(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
-            print("yes")
             login(request, user)
             return redirect('login')
     else:
@@ -30,4 +26,4 @@ def register(request):
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
     def get_success_url(self):
-        return reverse('profile')
+        return reverse('notes_list')

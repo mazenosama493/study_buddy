@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if form.instance.pk %}Edit Note{% else %}Create Note{% endif %}</title>
+</head>
+<body>
+    <h2>{% if form.instance.pk %}Edit Note{% else %}Create Note{% endif %}</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Display the author's name but do not allow editing -->
+        <p><strong>Author:</strong> {{ request.user.username }}</p>
+
+        <label for="id_title">Title:</label>
+        {{ form.title }}
+
+        <label for="id_content">Content:</label>
+        {{ form.content }}
+
+        <label for="id_file">Upload File:</label>
+        {{ form.file }}
+
+        <label for="id_is_public">
+            <input type="checkbox" name="is_public" id="id_is_public" {% if form.instance.is_public %}checked{% endif %}>
+            Make Public?
+        </label>
+
+        <label for="id_show_on_profile">
+            <input type="checkbox" name="show_on_profile" id="id_show_on_profile" {% if form.instance.show_on_profile %}checked{% endif %}>
+            Show this note only on my profile
+        </label>
+
+        <label for="id_grade_level">Grade Level:</label>
+        {{ form.grade_level }}
+
+        <label for="id_subject">Subject:</label>
+        {{ form.subject }}
+
+        <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
+    </form>
+
+    <a href="{% url 'notes_list' %}">Cancel</a>
+</body>
+</html>

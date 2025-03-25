@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes List</title>
+</head>
+<body>
+    <h2>All Notes</h2>
+
+    <!-- Navigation Buttons -->
+    <a href="{% url 'create_note' %}">
+        <button>Create New Note</button>
+    </a>
+    
+    <a href="{% url 'profile_view' %}">
+        <button>Go to Profile</button>
+    </a>
+
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'notes_list' %}">
+        <!-- Grade Level Dropdown -->
+        <label for="grade_level">Filter by Grade:</label>
+        <select name="grade_level">
+            <option value="">All Grades</option>
+            {% for grade_value, grade_label in GRADE_CHOICES %}
+                <option value="{{ grade_value }}" {% if grade_filter == grade_value %}selected{% endif %}>{{ grade_label }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Subject Dropdown -->
+        <label for="subject">Filter by Subject:</label>
+        <select name="subject">
+            <option value="">All Subjects</option>
+            {% for subject_value, subject_label in SUBJECT_CHOICES %}
+                <option value="{{ subject_value }}" {% if subject_filter == subject_value %}selected{% endif %}>{{ subject_label }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Username Search Bar -->
+        <label for="username">Search by Username:</label>
+        <input type="text" name="username" value="{{ username_filter }}" placeholder="Enter username">
+
+        <button type="submit">Search</button>
+    </form>
+
+    <ul>
+        {% for note in notes %}
+            <li>
+                <a href="{% url 'note_detail' note.id %}">{{ note.title }}</a> 
+                (Grade: {{ note.grade_level }}, Subject: {{ note.subject }})  
+                by <a href="{% url 'public_profile' note.author.username %}"><strong>{{ note.author.username }}</strong></a>
+
+                {% if note.author == request.user %}
+                    <a href="{% url 'edit_note' note.id %}">Edit</a> |
+                    <a href="{% url 'delete_note' note.id %}">Delete</a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <p>No notes available.</p>  <!-- ✅ Show message if no notes exist -->
+        {% endfor %}
+    </ul>
+</body>
+</html>

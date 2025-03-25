@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+</head>
+<body>
+    <h2>{{ profile.user.username }}'s Profile</h2>
+
+    <!-- Display Profile Picture -->
+    {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" width="150">
+    {% else %}
+        <p>No profile picture uploaded.</p>
+    {% endif %}
+
+    <!-- Display Bio -->
+    <p><strong>Bio:</strong> {{ profile.bio }}</p>
+
+    <!-- Navigation Buttons -->
+    <a href="{% url 'edit_profile' %}">
+        <button>Edit Profile</button>
+    </a>
+
+    <a href="{% url 'notes_list' %}">
+        <button>Go to Notes</button>
+    </a>
+
+    <!-- User's Notes Section -->
+    <h3>My Notes</h3>
+    <ul>
+        {% for note in notes %}
+            <li>
+                <a href="{% url 'note_detail' note.id %}">{{ note.title }}</a> 
+                (Grade: {{ note.grade_level }}, Subject: {{ note.subject }})
+            </li>
+        {% empty %}
+            <p>You haven't created any notes yet.</p>
+        {% endfor %}
+    </ul>
+
+    <!-- Logout Button -->
+    <a href="{% url 'logout' %}">
+        <button>Logout</button>
+    </a>
+</body>
+</html>

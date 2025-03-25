@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Custom Apps
+    'profile_users',
     'users',
+    'notes',
     'rest_framework',
     'rest_framework.authtoken',
 
@@ -78,6 +80,8 @@ TEMPLATES = [
         },
     },
 ]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 WSGI_APPLICATION = 'studybuddy.wsgi.application'
 
@@ -140,7 +144,7 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
-LOGIN_REDIRECT_URL = 'home'  
+LOGIN_REDIRECT_URL = 'notes:notes'  
 LOGOUT_REDIRECT_URL = 'login' 
 
 
