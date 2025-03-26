@@ -1,120 +1,160 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/notes/note_list.css' %}">
     <title>Notes List</title>
 </head>
+
 <body>
-    <h2>All Notes</h2>
-
-    <!-- Navigation Buttons -->
-    <a href="{% url 'create_note' %}"><button>Create New Note</button></a>
-    <a href="{% url 'profile_view' %}"><button>Go to Profile</button></a>
-
-    <!-- Search Form -->
-    <form method="GET" action="{% url 'notes_list' %}">
-        <label for="grade_level">Filter by Grade:</label>
-        <select name="grade_level">
-            <option value="">All Grades</option>
-            {% for grade_value, grade_label in GRADE_CHOICES %}
-                <option value="{{ grade_value }}" {% if grade_filter == grade_value %}selected{% endif %}>{{ grade_label }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="subject">Filter by Subject:</label>
-        <select name="subject">
-            <option value="">All Subjects</option>
-            {% for subject_value, subject_label in SUBJECT_CHOICES %}
-                <option value="{{ subject_value }}" {% if subject_filter == subject_value %}selected{% endif %}>{{ subject_label }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="username">Search by Username:</label>
-        <input type="text" name="username" value="{{ username_filter }}" placeholder="Enter username">
-        <button type="submit">Search</button>
-    </form>
-
-    <!-- Notes List with Full Details -->
-    <ul>
-        {% for note in notes %}
-            <li>
-                <h3>{{ note.title }}</h3>
-                <p><strong>Grade:</strong> {{ note.grade_level }} | <strong>Subject:</strong> {{ note.subject }}</p>  
-
-                <!-- Author Profile Link -->
-                <p>
-                    <a href="{% url 'public_profile' note.author.username %}">
-                        {% if note.author.profile_picture %}
-                            <img src="{{ note.author.profile_picture.url }}" alt="Profile Picture" width="50">
-                        {% endif %}
-                        <strong>{{ note.author.username }}</strong>
-                    </a>
-                </p>
-
-                <!-- Note Content -->
-                <p>{{ note.content }}</p>
-
-                <!-- File Download Option -->
-                {% if note.file %}
-                    <p><a href="{{ note.file.url }}" download><button>📥 Download Attachment</button></a></p>
+    <!-- Static Navbar -->
+    <header class="site-header">
+        <div class="logo-container">
+            <img src="{% static 'images/logo-2-trans.png' %}" alt="Study Buddy Logo" class="site-logo">
+        </div>
+        <h1 class="site-title">Study Buddy</h1>
+        <div class="profile-icon-container">
+            <a href="{% url 'profile_view' %}">
+                {% if request.user.profile_picture %}
+                <img src="{{ request.user.profile_picture.url }}" alt="Profile Avatar" class="author-avatar">
+                {% else %}
+                <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar" class="author-avatar">
                 {% endif %}
+            </a>
+        </div>
+    </header>
 
-                <!-- Like & Dislike Buttons -->
-                <form method="POST" action="{% url 'notes_list' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="note_id" value="{{ note.id }}">
-                    <button type="submit" name="action" value="like">👍 Like ({{ note.likes.count }})</button>
-                    <button type="submit" name="action" value="dislike">👎 Dislike ({{ note.dislikes.count }})</button>
-                </form>
+    <!-- Create New Note Button -->
+    <div class="create-note-button">
+        <a href="{% url 'create_note' %}">
+            <img src="{% static 'icons/add-note.svg' %}" alt="Add Note Icon" class="add-note-icon">
+        </a>
+    </div>
 
-                <!-- Comments Section -->
-                <h4>Comments</h4>
-                <ul>
-                    {% for comment in note.comments.all %}
-                        <li>
-                            <strong>{{ comment.user.username }}:</strong> {{ comment.content }}
-
-                            <!-- Reply Form -->
-                            <form method="POST" action="{% url 'notes_list' %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="note_id" value="{{ note.id }}">
-                                <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                                <input type="hidden" name="action" value="comment">
-                                <input type="text" name="content" placeholder="Write a reply..." required>
-                                <button type="submit">Reply</button>
-                            </form>
-
-                            <!-- Display Replies -->
-                            <ul>
-                                {% for reply in comment.replies.all %}
-                                    <li><strong>{{ reply.user.username }}:</strong> {{ reply.content }}</li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% empty %}
-                        <p>No comments yet.</p>
+    <!-- Main Content with Sidebar -->
+    <main class="main-content">
+        <!-- Sidebar for Filters -->
+        <aside class="sidebar">
+            <h3>Filters</h3>
+            <form method="GET" action="{% url 'notes_list' %}" class="filter-form">
+                <!-- Grade Level Dropdown -->
+                <label for="grade_level">Filter by Grade:</label>
+                <select name="grade_level" id="grade_level">
+                    <option value="">All Grades</option>
+                    {% for grade_value, grade_label in GRADE_CHOICES %}
+                    <option value="{{ grade_value }}" {% if grade_filter == grade_value %}selected{% endif %}>{{
+                        grade_label }}</option>
                     {% endfor %}
-                </ul>
+                </select>
 
-                <!-- Add Comment Form -->
-                <form method="POST" action="{% url 'notes_list' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="note_id" value="{{ note.id }}">
-                    <input type="hidden" name="action" value="comment">
-                    <input type="text" name="content" placeholder="Write a comment..." required>
-                    <button type="submit">Comment</button>
-                </form>
+                <!-- Subject Dropdown -->
+                <label for="subject">Filter by Subject:</label>
+                <select name="subject" id="subject">
+                    <option value="">All Subjects</option>
+                    {% for subject_value, subject_label in SUBJECT_CHOICES %}
+                    <option value="{{ subject_value }}" {% if subject_filter|default:'' == subject_value %}selected{%endif %}>
+                        {{ subject_label }}
+                    </option>
+                    {% endfor %}
+                </select>
 
-                <!-- Edit & Delete Options for Note Author -->
-                {% if note.author == request.user %}
-                    <a href="{% url 'edit_note' note.id %}">Edit</a> |
-                    <a href="{% url 'delete_note' note.id %}">Delete</a>
-                {% endif %}
-            </li>
-        {% empty %}
-            <p>No notes available.</p>  
-        {% endfor %}
-    </ul>
+                <!-- Username Search Bar -->
+                <label for="username">Search by Username:</label>
+                <input type="text" name="username" id="username" value="{{ username_filter }}"
+                    placeholder="Enter username">
+
+                <button type="submit">Apply Filters</button>
+            </form>
+        </aside>
+
+        <!-- Notes List -->
+        <section class="notes-list">
+            <ul>
+                {% for note in notes %}
+                <a href="{% url 'note_detail' note.id %}" class="note-link-con">
+                    <div class="note-card">
+                        <div class="note-header">
+                            <!-- Avatar -->
+                            {% if note.author.profile_picture %}
+                            <a href="{% url 'public_profile' note.author.username %}">
+                                <img src="{{ note.author.profile_picture.url }}" alt="Author Avatar" class="author-avatar">
+                                {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar"
+                                    class="author-avatar">
+                                {% endif %}
+                            </a>
+                            <!-- Author Info -->
+                            <div class="author-info">
+                                <strong>{{ note.author.username }}</strong>
+                            </div>
+
+                            <!-- Meta Information -->
+                            <div class="meta-container">
+                                <span class="note-meta-subject">
+                                    {% if note.subject == "history" %}
+                                    <img src="{% static 'icons/subject/history.svg' %}" alt="History Icon"
+                                        class="subject-icon">
+                                    {% elif note.subject == "mathematics" %}
+                                    <img src="{% static 'icons/subject/math.svg' %}" alt="Mathematics Icon"
+                                        class="subject-icon">
+                                    {% elif note.subject == "science" %}
+                                    <img src="{% static 'icons/subject/science.svg' %}" alt="Science Icon"
+                                        class="subject-icon">
+                                    {% elif note.subject == "english" %}
+                                    <img src="{% static 'icons/subject/english.svg' %}" alt="English Icon"
+                                        class="subject-icon">
+                                    {% elif note.subject == "computers" %}
+                                    <img src="{% static 'icons/subject/computers.svg' %}" alt="Computer Science Icon"
+                                        class="subject-icon">
+                                    {% elif note.subject == "arts" %}
+                                    <img src="{% static 'icons/subject/arts.svg' %}" alt="Arts Icon" class="subject-icon">
+                                    {% endif %}
+                                    {{ note.subject }}
+                                </span>
+                                <span class="note-meta-grade">Grade: {{ note.grade_level }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Note Content -->
+                        <div class="note-content">
+                            <h1>{{ note.title }}</h1>
+                        </div>
+
+                        <!-- Created At (Bottom Left) -->
+                        <div class="created-at">
+                            <span class="note-meta-date">created at: {{ note.created_at|date:"Y-m-d" }}</span>
+                        </div>
+
+                        <!-- Likes (Bottom Right) -->
+                        <div class="likes-section">
+                            <span class="note-meta-likes">
+                                <img src="{% static 'icons/heart-likes.svg' %}" alt="Like Icon">
+                                {{ note.likes.count }}
+                            </span>
+                        </div>
+
+                        <!-- Note Actions -->
+                        <div class="note-actions">
+                            {% if note.author == request.user %}
+                            <a href="{% url 'edit_note' note.id %}" class="action-link-edit">
+                                <img src="{% static 'icons/edit-icon.svg' %}" alt="Edit Icon">
+                            </a>
+                            <a href="{% url 'delete_note' note.id %}" class="action-link-delete">
+                                <img src="{% static 'icons/delete-icon.svg' %}" alt="Delete Icon">
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% empty %}
+                <p>No notes available.</p>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
 </body>
+
 </html>

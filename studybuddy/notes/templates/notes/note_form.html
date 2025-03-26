@@ -1,10 +1,14 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/notes/note_form.css' %}">
     <title>{% if form.instance.pk %}Edit Note{% else %}Create Note{% endif %}</title>
 </head>
+
 <body>
     <h2>{% if form.instance.pk %}Edit Note{% else %}Create Note{% endif %}</h2>
 
@@ -24,12 +28,14 @@
         {{ form.file }}
 
         <label for="id_is_public">
-            <input type="checkbox" name="is_public" id="id_is_public" {% if form.instance.is_public %}checked{% endif %}>
+            <input type="checkbox" name="is_public" id="id_is_public" {% if form.instance.is_public %}checked{% endif
+                %}>
             Make Public?
         </label>
 
         <label for="id_show_on_profile">
-            <input type="checkbox" name="show_on_profile" id="id_show_on_profile" {% if form.instance.show_on_profile %}checked{% endif %}>
+            <input type="checkbox" name="show_on_profile" id="id_show_on_profile" {% if form.instance.show_on_profile
+                %}checked{% endif %}>
             Show this note only on my profile
         </label>
 
@@ -44,4 +50,5 @@
 
     <a href="{% url 'notes_list' %}">Cancel</a>
 </body>
+
 </html>

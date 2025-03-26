@@ -1,17 +1,101 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/login/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login/login-taps-testmo.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/fav32.png' %}">
 </head>
-<body>
-    <h2>Login</h2>
-    
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
 
-    <p>Don't have an account? <a href="{% url 'register' %}">Sign Up</a></p>
+<body>
+    <header class="site-header">
+        <div class="logo-container">
+            <img src="{% static 'images/logo-2-trans.png' %}" alt="Study Buddy Logo" class="site-logo">
+        </div>
+        <h1 class="text-center">Study Buddy</h1>
+    </header>
+    <div class="background-animate">
+        <!-- will be Passed throw js -->
+    </div>
+    <!-- Info Container (Left Side) -->
+    <div class="info-container">
+        <div class="tabs">
+            <button class="tab-button active" data-tab="about-us">About Us</button>
+            <button class="tab-button" data-tab="mission">Our Mission</button>
+            <button class="tab-button" data-tab="vision">Our Vision</button>
+        </div>
+        <div class="tab-content" id="about-us">
+            <p>We are Study Buddy, a platform that connects teachers and students to foster learning and growth. Our
+                goal is
+                to make education accessible and engaging for everyone.</p>
+        </div>
+        <div class="tab-content" id="mission" style="display: none;">
+            <p>Our mission is to empower students and educators by providing tools and resources that enhance the
+                learning
+                experience.</p>
+        </div>
+        <div class="tab-content" id="vision" style="display: none;">
+            <p>Our vision is to create a world where every student has access to quality education, regardless of
+                location
+                or background.</p>
+        </div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <h2 class="text-center mb-4">Login</h2>
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            <div class="icon-input-group">
+                <img src="{% static 'icons/user-login.svg' %}" alt="Username Icon" class="input-icon">
+                <input type="text" name="username" id="username" autocomplete="username" placeholder="Username"
+                    required />
+            </div>
+            <div class="icon-input-group">
+                <img src="{% static 'icons/password-login.svg' %}" alt="Password Icon" class="input-icon">
+                <input type="password" name="password" id="password" autocomplete="current-password"
+                    placeholder="Password" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mt-3">Login</button>
+        </form>
+        <p class="signup-link text-center mt-3">
+            Don't have an account? <a href="{% url 'register' %}">Sign Up</a>
+        </p>
+    </div>
+
+    <!-- Testimonials Container -->
+    <div class="testimonials-container">
+        <div class="testimonial active">
+            <p>"Study Buddy helped me find the perfect tutor for my needs. Highly recommend!"</p>
+            <span>- Sarah, Student</span>
+        </div>
+        <div class="testimonial" style="display: none;">
+            <p>"As a teacher, Study Buddy makes it easy to connect with motivated students."</p>
+            <span>- John, Teacher</span>
+        </div>
+        <div class="testimonial" style="display: none;">
+            <p>"The platform is intuitive and user-friendly. Great job, Study Buddy team!"</p>
+            <span>- Emily, Student</span>
+        </div>
+    </div>
+    <script src="{% static 'js/control.js' %}"></script>
+
+    <script>
+        // Pass static URLs to JavaScript
+        const ICONS = {
+            book: "{% static 'icons/login/book-bg.svg' %}",
+            boook: "{% static 'icons/login/book-2-bg.svg' %}",
+            map: "{% static 'icons/login/map-bg.svg' %}",
+            maap: "{% static 'icons/login/map-2-bg.svg' %}",
+            pen: "{% static 'icons/login/pen-bg.svg' %}",
+            glasses: "{% static 'icons/login/glasses-bg.svg' %}"
+        };
+    </script>
+
+    <script src="{% static 'js/login/login-bg-mouse.js' %}"></script>
+    <script src="{% static 'js/login/login-testmon-taps.js' %}"></script>
 </body>
+
 </html>

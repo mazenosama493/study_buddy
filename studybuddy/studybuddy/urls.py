@@ -23,13 +23,14 @@ from django.urls import path, include
 from django.shortcuts import redirect
 
 # Redirect root URL to login page
-def redirect_to_login(request):
+def redirect_home(request):
+    if request.user.is_authenticated:
+        return redirect('notes_list')
     return redirect('login')
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
-    path('', redirect_to_login, name='home'),
+    path('', redirect_home, name='notes_list'),
     path('notes/', include('notes.urls')),
     path('profile/', include('profile_users.urls')),
 

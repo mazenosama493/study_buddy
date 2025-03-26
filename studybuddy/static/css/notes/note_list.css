@@ -1,0 +1,291 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0d1117;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Navbar */
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #3A4B40;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), 0 0 20px rgba(169, 201, 180, 0.8);
+}
+
+.logo-container img {
+    width: 50px;
+    height: 50px;
+}
+
+.site-title {
+    font-size: 1.5em;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.profile-icon-container img {
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+}
+
+/* Create New Note Button */
+.create-note-button {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
+}
+
+.add-note-icon {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+/* Main Content Layout */
+.main-content {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    gap: 40px;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #3A4B40;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), 0 0 20px rgba(169, 201, 180, 0.8);
+    margin-top: 20px;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+}
+
+.sidebar h3 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.filter-form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.filter-form select,
+.filter-form input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #171717;
+    color: white;
+    box-shadow: inset 0 0 10px rgba(169, 201, 180, 0.8);
+    transition: box-shadow 0.3s ease;
+}
+
+.filter-form select:focus,
+.filter-form input[type="text"]:focus {
+    box-shadow: inset 0 0 20px rgba(169, 201, 180, 0.8);
+}
+
+.filter-form button {
+    background-color: #A3C6DC;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    margin-top: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filter-form button:hover {
+    background-color: #6E91A5;
+    box-shadow: 0 0 10px #6E91A5, 0 0 20px #6E91A5, 0 0 30px #6E91A5;
+}
+
+/* Notes List */
+.notes-list {
+    flex-grow: 1;
+    margin-top: 20px;
+}
+
+.notes-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.note-card {
+    background-color: #3A4B40;
+    box-shadow: 3px 3px 6px #0c0c0c, -3px -3px 6px #8b8b8b;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.note-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3), 0 0 30px rgba(169, 201, 180, 0.8);
+}
+
+.note-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.meta-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    margin-left: auto;
+}
+
+.note-meta-subject,
+.note-meta-grade {
+    background-color: #171717;
+    box-shadow: 3px 3px 6px #1d2620, -3px -3px 6px #9da5a0;
+    padding: 5px 10px;
+    margin: 5px !important;
+    border-radius: 8px;
+    font-size: 0.9em;
+    color: #fff;
+    margin: 2px 0;
+    white-space: nowrap;
+}
+
+.note-meta-subject .subject-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+}
+
+.note-content {
+    text-align: center;
+}
+
+.note-content h1 {
+    margin: 10px 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #A3C6DC;
+    /* Shine effect */
+}
+
+.created-at {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    font-size: 0.8em;
+    opacity: 0.7;
+}
+
+.likes-section {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.note-meta-likes {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+.note-meta-likes img {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+}
+
+.note-actions {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.action-link-edit,
+.action-link-delete {
+    padding: 10px 15px;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+}
+
+.action-link-delete {
+    display: inline-block;
+    box-shadow: 3px 3px 6px #19201b, -3px -3px 6px #7f8681;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.action-link-edit {
+    display: inline-block;
+    box-shadow: 3px 3px 6px #19201b, -3px -3px 6px #7f8681;
+    margin-right: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+}
+
+.action-link-edit:hover,
+.action-link-delete:hover {
+    box-shadow: inset 3px 3px 6px #19201b, inset -3px -3px 6px #7f8681;
+}
+
+.note-card .author-info strong,
+.note-card .created-at span,
+.note-card .likes-section span,
+.note-card .meta-container span {
+    text-decoration: none;
+    color: white;
+}
+.note-content h1 {
+    cursor: pointer;
+ 
+}
+
+.note-link-con {
+    text-decoration: none !important;
+    color: inherit;
+}

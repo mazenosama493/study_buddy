@@ -1,20 +1,31 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="{% static 'css/notes/note_detail.css' %}"> -->
+
     <title>{{ note.title }}</title>
     <style>
-        .comment { margin-left: 20px; }
-        .reply { margin-left: 40px; }
+        .comment {
+            margin-left: 20px;
+        }
+
+        .reply {
+            margin-left: 40px;
+        }
     </style>
 </head>
+
 <body>
     <h2>{{ note.title }}</h2>
     <p>{{ note.content }}</p>
 
     {% if note.file %}
-        <p>Attached File: <a href="{{ note.file.url }}" download>Download</a></p>
+    <p>Attached File: <a href="{{ note.file.url }}" download>Download</a></p>
     {% endif %}
 
     <p>Author: {{ note.author.username }}</p>
@@ -39,26 +50,27 @@
 
     <ul>
         {% for comment in note.comments.all %}
-            <li class="comment">
-                <strong>{{ comment.user.username }}</strong>: {{ comment.content }}
-                <form method="POST" action="{% url 'add_comment' note.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                    <textarea name="content" placeholder="Reply..." required></textarea>
-                    <button type="submit">Reply</button>
-                </form>
+        <li class="comment">
+            <strong>{{ comment.user.username }}</strong>: {{ comment.content }}
+            <form method="POST" action="{% url 'add_comment' note.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                <textarea name="content" placeholder="Reply..." required></textarea>
+                <button type="submit">Reply</button>
+            </form>
 
-                {% for reply in comment.replies.all %}
-                    <ul class="reply">
-                        <li><strong>{{ reply.user.username }}</strong>: {{ reply.content }}</li>
-                    </ul>
-                {% endfor %}
-            </li>
+            {% for reply in comment.replies.all %}
+            <ul class="reply">
+                <li><strong>{{ reply.user.username }}</strong>: {{ reply.content }}</li>
+            </ul>
+            {% endfor %}
+        </li>
         {% empty %}
-            <p>No comments yet.</p>
+        <p>No comments yet.</p>
         {% endfor %}
     </ul>
 
     <a href="{% url 'notes_list' %}">Back to Notes</a>
 </body>
+
 </html>

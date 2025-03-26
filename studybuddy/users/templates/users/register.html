@@ -1,88 +1,200 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <style>
-        .hidden { display: none; }
-        .error { color: red; }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/register/register.css' %}">
 </head>
+
 <body>
-    <h2>Register</h2>
-    
-    {% if form.errors %}
-        <div class="error">
-            <strong>Form submission failed. Please correct the errors below:</strong>
-            <ul>
-                {% for field in form %}
+    <!-- Static Navbar -->
+    <header class="site-header">
+        <div class="logo-container">
+            <img src="{% static 'images/logo-2-trans.png' %}" alt="Study Buddy Logo" class="site-logo">
+        </div>
+        <h1 class="text-center">Study Buddy</h1>
+        <a href="{% url 'login' %}" class="login-link">
+            <img src="{% static 'icons/login-icon.svg' %}" alt="Login Icon" class="login-icon">
+            <span>Login</span>
+        </a>
+    </header>
+    <div class="background-animate">
+        <!-- will be Passed throw js -->
+    </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Preview Block -->
+        <div class="preview-container">
+            <h3>Preview</h3>
+            <div class="preview-data">
+                <div class="preview-avatar">
+                    <img id="avatar-preview" src="{% static 'images/default-avatar.png' %}" alt="Avatar Preview">
+                </div>
+                <div class="preview-details">
+                    <p><strong>Name:</strong> <span id="name-preview">John Doe</span></p>
+                    <div class="email-row">
+                        <strong>Email:</strong> <span id="email-preview" class="truncate">example@example.com</span>
+                    </div>
+                    <p><strong>Role:</strong> <span id="role-preview">Student</span></p>
+                    <p id="grade-subject-preview" class="hidden"><strong>Grade:</strong> <span id="grade-preview">Grade
+                            1</span></p>
+                    <p id="subject-preview-text" class="hidden"><strong>Subject: </strong> <span id="subject-preview">
+                            Mathematics</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div class="register-container">
+            <h2 class="text-center mb-4">Register</h2>
+
+            <!-- Error Messages -->
+            {% if form.errors %}
+            <div class="error-message">
+                <strong>Form submission failed. Please correct the errors below:</strong>
+                <ul>
+                    {% for field in form %}
                     {% for error in field.errors %}
-                        <li>{{ field.label }}: {{ error }}</li>
+                    <li>{{ field.label }}: {{ error }}</li>
                     {% endfor %}
-                {% endfor %}
-            </ul>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <form method="post" id="register-form" class="register-form" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Username -->
+                <div class="icon-input-group">
+                    <img src="{% static 'icons/user-login.svg' %}" alt="Username Icon" class="input-icon">
+                    <label for="id_username">Username:</label>
+                    <input type="text" id="id_username" name="username" autocomplete="username"
+                        placeholder="Enter your username" required>
+                </div>
+
+                <!-- Email -->
+                <div class="icon-input-group">
+                    <img src="{% static 'icons/email.svg' %}" alt="Email Icon" class="input-icon">
+                    <label for="id_email">Email:</label>
+                    <input type="email" id="id_email" name="email" placeholder="Enter your email" required>
+                </div>
+
+                <!-- Password -->
+                <div class="icon-input-group">
+                    <img src="{% static 'icons/password-login.svg' %}" alt="Password Icon" class="input-icon">
+                    <label for="id_password1">Password:</label>
+                    <input type="password" id="id_password1" name="password1" autocomplete="new-password"
+                        placeholder="Enter your password" required>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="icon-input-group">
+                    <img src="{% static 'icons/password-login.svg' %}" alt="Confirm Password Icon" class="input-icon">
+                    <label for="id_password2">Confirm Password:</label>
+                    <input type="password" id="id_password2" name="password2" autocomplete="new-password"
+                        placeholder="Confirm your password" required>
+                </div>
+
+                <!-- Role Selection -->
+                <div class="icon-input-group">
+                    <img src="{% static 'icons/role-reg.svg' %}" alt="Role Icon" class="input-icon">
+                    <label>Role:</label>
+                    <div class="role-radio-buttons">
+                        <label>
+                            <input type="radio" name="role" value="student" checked>
+                            Student
+                        </label>
+                        <label>
+                            <input type="radio" name="role" value="teacher">
+                            Teacher
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Subject Selection (Only for Teachers) -->
+                <div id="subject-field" class="hidden icon-input-group">
+                    <img src="{% static 'icons/grade-select.svg' %}" alt="Subject Icon" class="input-icon">
+                    <label>Select Subject:</label>
+                    <div class="custom-dropdown">
+                        <div class="dropdown-selected">-- Select Subject --</div>
+                        <div class="dropdown-options">
+                            <!-- <div data-value="">-- Select Subject --</div> -->
+                            <div data-value="math">Mathematics</div>
+                            <div data-value="science">Science</div>
+                            <div data-value="english">English</div>
+                            <div data-value="history">History</div>
+                            <div data-value="computers">Computers</div>
+                            <div data-value="arts">Arts</div>
+                        </div>
+                        <input type="hidden" id="id_subject_category" name="subject_category">
+                    </div>
+                </div>
+
+                <!-- Grade Selection (Only for Students) -->
+                <div id="grade-field" class="hidden icon-input-group">
+                    <img src="{% static 'icons/grade-select.svg' %}" alt="Grade Icon" class="input-icon">
+                    <label>Select Grade:</label>
+                    <div class="custom-dropdown">
+                        <div class="dropdown-selected">-- Select Grade --</div>
+                        <div class="dropdown-options">
+                            <!-- <div data-value="">-- Select Grade --</div> -->
+                            <div data-value="first">Grade 1</div>
+                            <div data-value="second">Grade 2</div>
+                            <div data-value="third">Grade 3</div>
+                            <div data-value="fourth">Grade 4</div>
+                            <div data-value="fifth">Grade 5</div>
+                            <div data-value="sixth">Grade 6</div>
+                            <div data-value="seventh">Grade 7</div>
+                            <div data-value="eighth">Grade 8</div>
+                            <div data-value="ninth">Grade 9</div>
+                            <div data-value="tenth">Grade 10</div>
+                            <div data-value="eleventh">Grade 11</div>
+                            <div data-value="twelfth">Grade 12</div>
+                        </div>
+                        <input type="hidden" id="id_grade_level" name="grade_level">
+                    </div>
+                </div>
+
+                <!-- Profile Picture -->
+                <div class="icon-input-group">
+                    <img src="{% static 'icons/avatar-reg.svg' %}" alt="Profile Picture Icon" class="input-icon">
+                    <label for="id_profile_picture">Profile Picture:</label>
+                    <label class="file-upload">
+                        Choose File
+                        <!-- {{ form.profile_picture }} -->
+                        <input type="file" id="id_profile_picture" name="profile_picture" accept="image/*">
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="register-btn" class="btn btn-primary w-100 mt-3">Register</button>
+            </form>
         </div>
-    {% endif %}
+    </main>
 
-    <form method="post" enctype="multipart/form-data" id="register-form"> <!-- ✅ Fix added here -->
-        {% csrf_token %}
-
-        <label for="id_username">Username:</label>
-        {{ form.username }}
-
-        <label for="id_email">Email:</label>
-        {{ form.email }}
-
-        <label for="id_password1">Password:</label>
-        {{ form.password1 }}
-
-        <label for="id_password2">Confirm Password:</label>
-        {{ form.password2 }}
-
-        <label for="id_role">Role:</label>
-        {{ form.role }}
-
-        <!-- Subject Selection (Only for Teachers) -->
-        <div id="subject-field" class="hidden">
-            <label for="id_subject_category">Select Subject (For Teachers Only):</label>
-            {{ form.subject_category }}
-        </div>
-
-        <!-- Grade Selection (Only for Students) -->
-        <div id="grade-field" class="hidden">
-            <label for="id_grade_level">Select Grade (For Students Only):</label>
-            {{ form.grade_level }}
-        </div>
-
-        <label for="id_profile_picture">Profile Picture:</label>
-        {{ form.profile_picture }}
-
-        <button type="submit" id="register-btn">Register</button>
-    </form>
+    <!-- Footer -->
+    <!-- <footer class="site-footer">
+        <p>&copy; 2025 Study Buddy | All Rights Reserved</p>
+    </footer> -->
+    <script src="{% static 'js/register/register-mouce-bg.js' %}"></script>
+    <script src="{% static 'js/register/register-func.js' %}"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var roleField = document.querySelector("#id_role");
-            var subjectField = document.querySelector("#subject-field");
-            var gradeField = document.querySelector("#grade-field");
-
-            function toggleFields() {
-                if (roleField.value === "teacher") {
-                    subjectField.classList.remove("hidden");
-                    gradeField.classList.add("hidden");
-                } else if (roleField.value === "student") {
-                    subjectField.classList.add("hidden");
-                    gradeField.classList.remove("hidden");
-                } else {
-                    subjectField.classList.add("hidden");
-                    gradeField.classList.add("hidden");
-                }
-            }
-
-            roleField.addEventListener("change", toggleFields);
-            toggleFields(); // Run once when the page loads
-        });
+        // Pass static URLs to JavaScript
+        const ICONS = {
+            book: "{% static 'icons/login/book-bg.svg' %}",
+            boook: "{% static 'icons/login/book-2-bg.svg' %}",
+            map: "{% static 'icons/login/map-bg.svg' %}",
+            maap: "{% static 'icons/login/map-2-bg.svg' %}",
+            pen: "{% static 'icons/login/pen-bg.svg' %}",
+            glasses: "{% static 'icons/login/glasses-bg.svg' %}"
+        };
     </script>
+
 </body>
+
 </html>

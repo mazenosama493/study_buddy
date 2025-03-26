@@ -8,11 +8,12 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 def public_profile_view(request, username):
     """ View a public profile """
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(Profile, user=user)
-    
+
     # ✅ Show only public notes
     notes = user.note_set.all()
 
@@ -20,6 +21,7 @@ def public_profile_view(request, username):
         'profile': profile,
         'notes': notes
     })
+
 
 @login_required
 def profile_view(request):
@@ -42,7 +44,8 @@ def edit_profile(request):
         if profile_form.is_valid() and picture_form.is_valid():
             profile_form.save()
             picture_form.save()
-            return redirect('profile_view')  # ✅ Redirect to profile after saving
+            # ✅ Redirect to profile after saving
+            return redirect('profile_view')
 
     else:
         profile_form = ProfileForm(instance=profile)

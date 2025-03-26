@@ -1,0 +1,450 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0d1117;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Static Navbar */
+.site-header {
+    background-color: #3A4B40;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.logo-container img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+h1.text-center {
+    margin: 0;
+    font-size: 24px;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.login-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login-link .login-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Main Content */
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 100px;
+    /* Space for navbar */
+    width: 100%;
+    max-width: 1200px;
+    gap: 60px;
+    /* Increased gap */
+}
+
+.preview-container {
+    margin-left: -40px;
+    /* Move preview block further left */
+}
+
+/* Preview Block */
+.preview-container {
+    background-color: #3A4B40;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 50px rgba(169, 201, 180, 0.8);
+    width: 300px;
+    text-align: left;
+    color: white;
+}
+
+.preview-data {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.preview-avatar img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.preview-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.preview-details p {
+    margin: 0;
+}
+
+.preview-details strong,
+.preview-details span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.preview-details strong {
+    width: 60px;
+    /* Adjust as needed */
+}
+
+.preview-details span {
+    flex-grow: 1;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Register Container */
+.register-container {
+    background-color: #3A4B40;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 50px rgba(169, 201, 180, 0.8);
+    width: 400px;
+    text-align: center;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.icon-input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.input-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    text-align: left;
+    width: 100%;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #A9C9B4;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus {
+    border-color: #A3C6DC;
+}
+
+/* Radio Button Styling */
+.role-radio-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.role-radio-buttons label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+input[type="radio"] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #A9C9B4;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="radio"]:checked {
+    background-color: #A3C6DC;
+    border-color: #A3C6DC;
+}
+
+/* File Upload Button */
+.file-upload {
+    display: inline-block;
+    background-color: #A9C9B4;
+    color: #0d1117;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.file-upload input[type="file"] {
+    display: none;
+}
+
+/* Submit Button */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #A3C6DC;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    background-color: #6E91A5;
+    box-shadow: 0 0 10px #6E91A5, 0 0 20px #6E91A5, 0 0 30px #6E91A5;
+}
+
+/* Footer */
+.site-footer {
+    background-color: #3A4B40;
+    padding: 10px 20px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    position: fixed;
+    bottom: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Truncate Long Text */
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    /* Adjust as needed */
+    display: inline-block;
+}
+
+/* Align Email Label and Value in Same Line */
+.preview-details p {
+    margin: 0;
+}
+
+.preview-details strong,
+.preview-details span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.preview-details strong {
+    width: 60px;
+    /* Adjust as needed */
+}
+
+.preview-details span {
+    flex-grow: 1;
+}
+
+/* Ensure only one field is visible */
+.hidden {
+    display: none;
+}
+
+/* Custom Dropdown Styling */
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+    font-size: 14px;
+}
+
+.dropdown-selected {
+    padding: 10px;
+    border: 2px solid #A9C9B4;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dropdown-options {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #3A4B40;
+    border: 2px solid #A9C9B4;
+    border-radius: 5px;
+    z-index: 1000;
+    /* overflow: hidden; */
+}
+
+.dropdown-options.active {
+    display: block;
+}
+
+.dropdown-options div {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-options div:hover {
+    background-color: #A3C6DC;
+    color: black;
+}
+
+
+
+/* Animated Background */
+.background-animate {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;   
+    z-index: -1;
+}
+.icon {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+.flying-item {
+    position: absolute;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+
+
+.mouse-shadow {
+    position: absolute;
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle, rgba(169, 201, 180, 0.322) 10%, rgba(110, 145, 165, 0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: -1;
+        transform: translate(-50%, -50%);
+        opacity: 1;
+        transition: opacity 0.2s ease;
+}
+
+.register-container {
+    position: relative;
+    z-index: 1;
+}
+
+
+@keyframes float-right {
+    0% {
+        transform: translate(-100%, -50%) rotate(0deg);
+    }
+
+    25% {
+        transform: translate(0%, -20%) rotate(10deg);
+    }
+
+    50% {
+        transform: translate(100vw, 0%) rotate(0deg);
+    }
+
+    75% {
+        transform: translate(0%, 20%) rotate(-10deg);
+    }
+
+    100% {
+        transform: translate(-100%, 50%) rotate(0deg);
+    }
+}
+
+@keyframes float-left {
+    0% {
+        transform: translate(100%, -50%) rotate(0deg);
+    }
+
+    25% {
+        transform: translate(0%, -20%) rotate(-10deg);
+    }
+
+    50% {
+        transform: translate(-100vw, 0%) rotate(0deg);
+    }
+
+    75% {
+        transform: translate(0%, 20%) rotate(10deg);
+    }
+
+    100% {
+        transform: translate(100%, 50%) rotate(0deg);
+    }
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .preview-container,
+    .register-container {
+        width: 90%;
+        max-width: 400px;
+    }
+}
