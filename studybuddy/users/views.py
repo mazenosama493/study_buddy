@@ -24,6 +24,9 @@ def register(request):
         form = CustomUserCreationForm()
     return render(request, 'users/register.html', {'form': form})
 class CustomLoginView(LoginView):
+    def redirect_authenticated_user(self):
+        if user.is_authenticated:
+            return redirect('notes_list')
     template_name = 'users/login.html'
     def get_success_url(self):
         return reverse('notes_list')
