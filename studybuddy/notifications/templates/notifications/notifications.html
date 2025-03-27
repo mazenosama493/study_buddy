@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+</head>
+<body>
+    <h2>Notifications</h2>
+
+    <ul>
+        {% for notification in notifications %}
+            <li>
+                <p>{{ notification.message }}</p>
+                <small>{{ notification.created_at }}</small>
+
+                {% if notification.notification_type == "follow_request" and notification.follow_request_id %}
+                    <form action="{% url 'accept_follow_request' notification.follow_request_id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">Accept</button>
+                    </form>
+                    <form action="{% url 'reject_follow_request' notification.follow_request_id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">Reject</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% empty %}
+            <p>No notifications yet.</p>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'profile_view' %}"><button>Back to Profile</button></a>
+</body>
+</html>

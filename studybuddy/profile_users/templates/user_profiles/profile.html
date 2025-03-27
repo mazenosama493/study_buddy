@@ -8,9 +8,27 @@
 <body>
     <h2>{{ request.user.username }}'s Profile</h2>
 
+    <!-- Display Follower Count -->
+    <p><strong>Followers:</strong> {{ followers }}</p>
+
+    <!-- List of Followers -->
+    <ul>
+        {% for follower in followerss %}
+            <li>
+                {{ follower.follower.username }} 
+                <form action="{% url 'remove_follower' follower.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Remove</button>
+                </form>
+            </li>
+        {% empty %}
+            <p>You have no followers.</p>
+        {% endfor %}
+    </ul>
+
     <!-- Profile Picture -->
-    {% if request.user.profile_picture %}
-        <img src="{{ request.user.profile_picture.url }}" alt="Profile Picture" width="150">
+    {% if profile.user.profile_picture %}
+        <img src="{{ profile.user.profile_picture.url }}" alt="Profile Picture" width="150">
     {% else %}
         <p>No profile picture uploaded.</p>
     {% endif %}

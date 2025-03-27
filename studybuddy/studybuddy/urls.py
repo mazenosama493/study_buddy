@@ -33,6 +33,7 @@ urlpatterns = [
     path('', redirect_home, name='notes_list'),
     path('notes/', include('notes.urls')),
     path('profile/', include('profile_users.urls')),
+    path('notifications/', include('notifications.urls')),
 
 ]
 

@@ -8,6 +8,9 @@
 <body>
     <h2>{{ profile.user.username }}'s Profile</h2>
 
+    <!-- Display Follower Count -->
+    <p><strong>Followers:</strong> {{ count_followers }}</p>
+
     <!-- Follow/Unfollow Button -->
     {% if user.is_authenticated %}
         {% if user != profile.user %}
