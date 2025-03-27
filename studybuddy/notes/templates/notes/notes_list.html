@@ -45,8 +45,7 @@
                 <select name="grade_level" id="grade_level">
                     <option value="">All Grades</option>
                     {% for grade_value, grade_label in GRADE_CHOICES %}
-                    <option value="{{ grade_value }}" {% if grade_filter == grade_value %}selected{% endif %}>{{
-                        grade_label }}</option>
+                    <option value="{{ grade_value }}" {% if grade_filter == grade_value %}selected{% endif %}>{{grade_label }}</option>
                     {% endfor %}
                 </select>
 
