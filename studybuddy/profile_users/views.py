@@ -5,6 +5,8 @@ from .forms import ProfileForm, UserEditForm
 from notes import models
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+from .models import Follow
 
 User = get_user_model()
 
@@ -13,13 +15,19 @@ def public_profile_view(request, username):
     """ View a public profile """
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(Profile, user=user)
+    is_following = Follow.objects.filter(follower=request.user, following=user).exists()
 
-    # ✅ Show only public notes
-    notes = user.note_set.all()
+    if Follow.objects.filter(follower=request.user, following=user).exists():
+        notes = user.note_set.all()
+    else:
+        notes =user.note_set.filter(show_on_profile=False)
+    if user.username == request.user.username:
+        return redirect('profile_view')
 
     return render(request, 'user_profiles/public_profile.html', {
         'profile': profile,
-        'notes': notes
+        'notes': notes,
+        'is_following': is_following
     })
 
 
@@ -55,3 +63,18 @@ def edit_profile(request):
         'profile_form': profile_form,
         'picture_form': picture_form
     })
+
+
+@login_required
+def follow_user(request, user_id):
+    user_to_follow = get_object_or_404(User, id=user_id)
+    if user_to_follow != request.user:
+        Follow.objects.get_or_create(follower=request.user, following=user_to_follow)
+    return redirect('public_profile', username=user_to_follow.username)
+
+
+@login_required
+def unfollow_user(request, user_id):
+    user_to_unfollow = get_object_or_404(User, id=user_id)
+    Follow.objects.filter(follower=request.user, following=user_to_unfollow).delete()
+    return redirect('public_profile', username=user_to_unfollow.username)

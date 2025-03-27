@@ -8,6 +8,27 @@
 <body>
     <h2>{{ profile.user.username }}'s Profile</h2>
 
+    <!-- Follow/Unfollow Button -->
+    {% if user.is_authenticated %}
+        {% if user != profile.user %}
+            {% if is_following %}
+                <!-- Unfollow Button -->
+                <form method="POST" action="{% url 'unfollow_user' profile.user.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Unfollow</button>
+                </form>
+            {% else %}
+                <!-- Follow Button -->
+                <form method="POST" action="{% url 'follow_user' profile.user.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Follow</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in</a> to follow users.</p>
+    {% endif %}
+
     <!-- Profile Picture -->
     {% if profile.user.profile_picture %}
         <img src="{{ profile.user.profile_picture.url }}" alt="Profile Picture" width="150">
