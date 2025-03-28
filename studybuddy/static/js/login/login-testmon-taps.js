@@ -1,30 +1,41 @@
-document.addEventListener('DOMContentLoaded', function () {
-    // Tab Switching
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
+document.addEventListener("DOMContentLoaded", function () {
+  const tabButtons = document.querySelectorAll(".tab-button");
+  const tabContents = document.querySelectorAll(".tab-content");
 
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active class from all buttons and contents
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabContents.forEach(content => content.style.display = 'none');
+  function switchTab(targetTabId) {
+    if (!targetTabId) return;
 
-            // Add active class to the clicked button and show corresponding content
-            button.classList.add('active');
-            const targetTab = button.getAttribute('data-tab');
-            document.getElementById(targetTab).style.display = 'block';
-        });
+    // Hide all tab contents
+    tabContents.forEach((content) => {
+      content.style.display = "none";
+      content.classList.remove("active");
     });
 
-    // Auto-Swapping Testimonials
-    const testimonials = document.querySelectorAll('.testimonial');
-    let currentIndex = 0;
+    // Remove active state from all buttons
+    tabButtons.forEach((button) => button.classList.remove("active"));
 
-    function showNextTestimonial() {
-        testimonials[currentIndex].style.display = 'none';
-        currentIndex = (currentIndex + 1) % testimonials.length;
-        testimonials[currentIndex].style.display = 'block';
+    // Show the selected tab
+    const selectedTab = document.getElementById(targetTabId);
+    const selectedButton = document.querySelector(
+      `[data-tab="${targetTabId}"]`
+    );
+
+    if (selectedTab && selectedButton) {
+      selectedButton.classList.add("active");
+      selectedTab.style.display = "block";
+      setTimeout(() => selectedTab.classList.add("active"), 10);
     }
+  }
 
-    setInterval(showNextTestimonial, 5000); // Swap every 5 seconds
+  // Attach event listeners to tab buttons
+  tabButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      switchTab(this.getAttribute("data-tab"));
+    });
+  });
+
+  // Initialize first tab as active
+  if (tabButtons.length > 0) {
+    switchTab(tabButtons[0].getAttribute("data-tab"));
+  }
 });

@@ -5,20 +5,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{% static 'images/fav32.png' %}">
     <link rel="stylesheet" href="{% static 'css/notes/delete_notes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/root.css' %}">
 
     <title>Confirm Delete</title>
 </head>
 
 <body>
-    <h2>Confirm Delete</h2>
-    <p>Are you sure you want to delete the note: <strong>{{ note.title }}</strong>?</p>
+    <div class="form-container">
+        <h2>Confirm Delete</h2>
+        <p>Are you sure you want to delete the note: <strong>{{ note.title }}</strong>?</p>
 
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit">Yes, Delete</button>
-        <a href="{% url 'notes_list' %}">Cancel</a>
-    </form>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit">Yes, Delete</button>
+            <a href="{% url 'notes_list' %}">Cancel</a>
+        </form>
+    </div>
 </body>
 
 </html>

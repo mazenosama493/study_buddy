@@ -4,9 +4,11 @@
 
 <head>
     <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/root.css' %}">
     <link rel="stylesheet" href="{% static 'css/login/login.css' %}">
     <link rel="stylesheet" href="{% static 'css/login/login-taps-testmo.css' %}">
     <link rel="icon" type="image/png" href="{% static 'images/fav32.png' %}">
+    <script src="{% static 'js/login/login-testmon-taps.js' %}"></script>
 </head>
 
 <body>
@@ -26,10 +28,9 @@
             <button class="tab-button" data-tab="mission">Our Mission</button>
             <button class="tab-button" data-tab="vision">Our Vision</button>
         </div>
+
         <div class="tab-content" id="about-us">
-            <p>We are Study Buddy, a platform that connects teachers and students to foster learning and growth. Our
-                goal is
-                to make education accessible and engaging for everyone.</p>
+            <p>We are Study Buddy, a platform that connects teachers and students to foster learning and growth.</p>
         </div>
         <div class="tab-content" id="mission" style="display: none;">
             <p>Our mission is to empower students and educators by providing tools and resources that enhance the
@@ -37,9 +38,7 @@
                 experience.</p>
         </div>
         <div class="tab-content" id="vision" style="display: none;">
-            <p>Our vision is to create a world where every student has access to quality education, regardless of
-                location
-                or background.</p>
+            <p>Our vision is to create a world where every student has access to quality education.</p>
         </div>
     </div>
 
@@ -94,8 +93,8 @@
         };
     </script>
 
-    <script src="{% static 'js/login/login-bg-mouse.js' %}"></script>
-    <script src="{% static 'js/login/login-testmon-taps.js' %}"></script>
+    <script src="{% static 'js/animated-bg.js' %}"></script>
+
 </body>
 
 </html>

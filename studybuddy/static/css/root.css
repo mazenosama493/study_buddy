@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+:root {
+    --primary-color: #01bf71;
+    --primary-hover: #00f7ff;
+    --background-dark: #010606;
+    --background-light: #001a1a;
+    --text-primary: rgba(255, 255, 255, 0.9);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.1));
+    --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px rgba(1, 191, 113, 0.2);
+    --shadow-lg: 0 10px 15px rgba(1, 191, 113, 0.3);
+    --shadow-glow: 0 0 30px rgba(1, 191, 113, 0.2);
+    --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animated Background */
+.background-animate {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.flying-item {
+    position: absolute;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+.flying-item img {
+    filter: drop-shadow(0 0 10px var(--primary-color));
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+.mouse-shadow {
+    position: fixed;
+    width: 150px;
+    height: 150px;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(80, 250, 123, 0.1) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    transition: opacity 0.3s ease;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+@keyframes float-right {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    50% {
+        transform: translate(30px, -15px) rotate(10deg);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+}
+
+@keyframes float-left {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    50% {
+        transform: translate(-30px, -15px) rotate(-10deg);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+}

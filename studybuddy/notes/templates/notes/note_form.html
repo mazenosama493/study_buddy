@@ -5,50 +5,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{% static 'images/fav32.png' %}">
     <link rel="stylesheet" href="{% static 'css/notes/note_form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/root.css' %}">
     <title>{% if form.instance.pk %}Edit Note{% else %}Create Note{% endif %}</title>
 </head>
 
 <body>
-    <h2>{% if form.instance.pk %}Edit Note{% else %}Create Note{% endif %}</h2>
+    <div class="background-animate">
+        <!-- will be Passed throw js -->
+    </div>
+    <div class="container">
+        <h2>{% if form.instance.pk %}Edit Note{% else %}Create Note{% endif %}</h2>
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        <!-- Display the author's name but do not allow editing -->
-        <p><strong>Author:</strong> {{ request.user.username }}</p>
+            <div class="form-group author-info">
+                <div class="profile-icon">
+                    {% if request.user.profile_picture %}
+                    <img src="{{ request.user.profile_picture.url }}" alt="Profile Avatar" class="author-avatar">
+                    {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar" class="author-avatar">
+                    {% endif %}
+                </div>
+                <!-- <span class="label">Author</span> -->
+                <span class="value">{{ request.user.username }}</span>
+            </div>
 
-        <label for="id_title">Title:</label>
-        {{ form.title }}
+            <div class="form-group">
+                <label for="id_title">Title</label>
+                {{ form.title }}
+            </div>
 
-        <label for="id_content">Content:</label>
-        {{ form.content }}
+            <div class="form-group">
+                <label for="id_content">Content</label>
+                {{ form.content }}
+            </div>
 
-        <label for="id_file">Upload File:</label>
-        {{ form.file }}
+            <div class="form-group">
+                <label for="id_file">Upload File</label>
+                {{ form.file }}
+            </div>
 
-        <label for="id_is_public">
-            <input type="checkbox" name="is_public" id="id_is_public" {% if form.instance.is_public %}checked{% endif
-                %}>
-            Make Public?
-        </label>
+            <div class="form-row">
+                <div class="form-group checkbox-group">
+                    <label for="id_is_public" class="checkbox-label">
+                        <input type="checkbox" name="is_public" id="id_is_public" {% if form.instance.is_public%}checked{% endif %}>
+                        <span>Make Public</span>
+                    </label>
+                </div>
 
-        <label for="id_show_on_profile">
-            <input type="checkbox" name="show_on_profile" id="id_show_on_profile" {% if form.instance.show_on_profile
-                %}checked{% endif %}>
-            Show this note only on my profile
-        </label>
+                <div class="form-group checkbox-group">
+                    <label for="id_show_on_profile" class="checkbox-label">
+                        <input type="checkbox" name="show_on_profile" id="id_show_on_profile" {% if form.instance.show_on_profile %}checked{% endif %}>
+                        <span>Show on Profile Only</span>
+                    </label>
+                </div>
+            </div>
 
-        <label for="id_grade_level">Grade Level:</label>
-        {{ form.grade_level }}
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="id_grade_level">Grade Level</label>
+                    {{ form.grade_level }}
+                </div>
 
-        <label for="id_subject">Subject:</label>
-        {{ form.subject }}
+                <div class="form-group half-width">
+                    <label for="id_subject">Subject</label>
+                    {{ form.subject }}
+                </div>
+            </div>
 
-        <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
-    </form>
+            <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %} Note</button>
+        </form>
 
-    <a href="{% url 'notes_list' %}">Cancel</a>
+        <a href="{% url 'notes_list' %}" class="cancel-link">Cancel</a>
+    </div>
+
+    <script src="{% static 'js/animated-bg.js' %}"></script>
+    <script>
+        // Pass static URLs to JavaScript
+        const ICONS = {
+            book: "{% static 'icons/login/book-bg.svg' %}",
+            boook: "{% static 'icons/login/book-2-bg.svg' %}",
+            map: "{% static 'icons/login/map-bg.svg' %}",
+            maap: "{% static 'icons/login/map-2-bg.svg' %}",
+            pen: "{% static 'icons/login/pen-bg.svg' %}",
+            glasses: "{% static 'icons/login/glasses-bg.svg' %}"
+        };
+    </script>
 </body>
 
 </html>

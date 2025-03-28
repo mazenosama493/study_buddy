@@ -1,20 +1,43 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, var(--background-dark), var(--background-light));
     margin: 0;
     padding: 0;
+    color: var(--text-primary);
 }
 
 .navbar {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: var(--gradient-glass);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-lg);
+    padding: 1rem 0;
+}
+
+.navbar-nav .nav-link {
+    color: var(--text-primary);
+    transition: var(--transition-all);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+}
+
+.navbar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 footer {
-    background-color: #e9ecef;
-    color: #6c757d;
-    font-size: 14px;
+    background: var(--gradient-glass);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    padding: 1rem 0;
+    margin-top: 2rem;
 }
 
 .container {
-    max-width: 960px;
+    max-width: 1200px;
+    padding: 0 1rem;
+    margin: 0 auto;
 }

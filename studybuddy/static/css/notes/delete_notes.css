@@ -1,4 +1,3 @@
-/* General Reset */
 * {
     margin: 0;
     padding: 0;
@@ -6,9 +5,9 @@
 }
 
 body {
-    background-color: #0d1117;
-    font-family: 'Poppins', sans-serif;
-    color: white;
+    background-color: var(--background-dark);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -17,41 +16,82 @@ body {
     overflow-x: hidden;
 }
 
+.form-container {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeIn 0.3s ease;
+}
+
 h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
 p {
-    margin-top: 10px;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+strong {
+    color: var(--primary-color);
+    font-weight: 500;
 }
 
 form {
-    margin-top: 20px;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
 }
 
 button[type="submit"] {
-    background-color: #A3C6DC;
+    background: var(--gradient-primary);
     border: none;
     color: white;
-    padding: 10px 20px;
-    margin-top: 10px;
-    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition: var(--transition-all);
+    box-shadow: var(--shadow-md);
 }
 
 button[type="submit"]:hover {
-    background-color: #6E91A5;
-    box-shadow: 0 0 10px #6E91A5, 0 0 20px #6E91A5, 0 0 30px #6E91A5;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
 }
 
 a {
-    color: #A3C6DC;
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    color: var(--text-secondary);
     text-decoration: none;
-    transition: color 0.3s ease;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: var(--transition-all);
 }
 
 a:hover {
-    color: #6E91A5;
+    color: var(--primary-hover);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

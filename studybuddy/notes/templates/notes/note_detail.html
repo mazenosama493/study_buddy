@@ -1,76 +1,184 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link rel="stylesheet" href="{% static 'css/notes/note_detail.css' %}"> -->
-
+    <link rel="icon" type="image/png" href="{% static 'images/fav32.png' %}">
+    <link rel="stylesheet" href="{% static 'css/notes/note_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/root.css' %}">
     <title>{{ note.title }}</title>
-    <style>
-        .comment {
-            margin-left: 20px;
-        }
-
-        .reply {
-            margin-left: 40px;
-        }
-    </style>
 </head>
 
 <body>
-    <h2>{{ note.title }}</h2>
-    <p>{{ note.content }}</p>
+    <div class="background-animate">
+        <!-- will be Passed throw js -->
+    </div>
+    <!-- Static Navbar -->
+    <header class="site-header">
+        <div class="logo-container">
+            <a href="{% url 'notes_list' %}">
+             <img src="{% static 'images/logo-2-trans.png' %}" alt="Study Buddy Logo" class="site-logo">
+            </a>
+        </div>
+        <h1 class="site-title">Study Buddy</h1>
+        <div class="profile-icon-container">
+            <a href="{% url 'profile_view' %}">
+                {% if request.user.profile_picture %}
+                <img src="{{ request.user.profile_picture.url }}" alt="Profile Avatar" class="author-avatar">
+                {% else %}
+                <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar" class="author-avatar">
+                {% endif %}
+            </a>
+        </div>
+    </header>
 
-    {% if note.file %}
-    <p>Attached File: <a href="{{ note.file.url }}" download>Download</a></p>
-    {% endif %}
+    <main class="main-content">
+        <div class="note-card">
+            <div class="note-header">
+                <div class="author-info">
+                    {% if note.author.profile_picture %}
+                    <img src="{{ note.author.profile_picture.url }}" alt="Author Avatar" class="author-avatar">
+                    {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" alt="Author Avatar" class="author-avatar">
+                    {% endif %}
+                    <div class="author-details">
+                        <span class="author-name">{{ note.author.username }}</span>
+                        <span class="note-visibility">{{ note.is_public|yesno:"Public,Private" }}</span>
+                    </div>
+                </div>
+            </div>
 
-    <p>Author: {{ note.author.username }}</p>
-    <p>Public: {{ note.is_public }}</p>
+            <div class="note-content">
+                <h2 class="note-title">{{ note.title }}</h2>
+                <p class="note-text">{{ note.content }}</p>
+                {% if note.file %}
+                <div class="attachment">
+                    <div class="media-preview">
+                        {% with file_extension=note.file.name|lower|slice:"-3:" %}
+                        {% if file_extension in 'mp4,webm,mov' %}
+                        <video controls class="media-content">
+                            <source src="{{ note.file.url }}" type="video/{{ file_extension }}">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% elif file_extension in 'mp3,wav,ogg' %}
+                        <audio controls class="media-content">
+                            <source src="{{ note.file.url }}" type="audio/{{ file_extension }}">
+                            Your browser does not support the audio tag.
+                        </audio>
+                        {% elif file_extension in 'jpg,png,gif,bmp,svg,jpeg' %}
+                        <img src="{{ note.file.url }}" alt="Attachment Preview" class="media-content">
+                        {% elif file_extension == 'pdf' %}
+                        <iframe src="{{ note.file.url }}" class="media-content pdf-preview"></iframe>
+                        {% elif file_extension in 'txt,doc,docx' %}
+                        <div class="text-preview media-content">
+                            <p>Text document preview not available</p>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+                    <a href="{{ note.file.url }}" download class="download-link">
+                        <img src="{% static 'icons/download-icon.svg' %}" alt="Download" class="download-icon">
+                        Download Attachment
+                    </a>
+                </div>
+                {% endif %}
+            </div>
 
-    <form method="POST" action="{% url 'like_note' note.id %}">
-        {% csrf_token %}
-        <button type="submit">Like ({{ note.likes.count }})</button>
-    </form>
+            <div class="note-actions">
+                <form method="POST" action="{% url 'like_note' note.id %}" class="action-form">
+                    {% csrf_token %}
+                    <button type="submit" class="action-button like-button">
+                        <img src="{% static 'icons/heart-likes.svg' %}" alt="Like" class="action-icon">
+                        <span>{{ note.likes.count }}</span>
+                    </button>
+                </form>
+                <form method="POST" action="{% url 'dislike_note' note.id %}" class="action-form">
+                    {% csrf_token %}
+                    <button type="submit" class="action-button dislike-button">
+                        <img src="{% static 'icons/dislike-icon.svg' %}" alt="Dislike" class="action-icon">
+                        <span>{{ note.dislikes.count }}</span>
+                    </button>
+                </form>
+            </div>
 
-    <form method="POST" action="{% url 'dislike_note' note.id %}">
-        {% csrf_token %}
-        <button type="submit">Dislike ({{ note.dislikes.count }})</button>
-    </form>
+            <div class="comments-section">
+                <h3 class="comments-title">Comments</h3>
+                <form method="POST" action="{% url 'add_comment' note.id %}" class="comment-form">
+                    {% csrf_token %}
+                    <div class="comment-input-container">
+                        <textarea name="content" placeholder="Write a comment..." required
+                            class="comment-input"></textarea>
+                        <button type="submit" class="submit-comment">Post</button>
+                    </div>
+                </form>
 
-    <h3>Comments</h3>
-    <form method="POST" action="{% url 'add_comment' note.id %}">
-        {% csrf_token %}
-        <textarea name="content" required></textarea>
-        <button type="submit">Add Comment</button>
-    </form>
+                <div class="comments-list">
+                    {% for comment in note.comments.all %}
+                    <div class="comment">
+                        <div class="comment-header">
+                            {% if comment.user.profile_picture %}
+                            <img src="{{ comment.user.profile_picture.url }}" alt="Commenter Avatar"
+                                class="commenter-avatar">
+                            {% else %}
+                            <img src="{% static 'images/default-avatar.png' %}" alt="Commenter Avatar"
+                                class="commenter-avatar">
+                            {% endif %}
+                            <span class="commenter-name">{{ comment.user.username }}</span>
+                        </div>
+                        <p class="comment-content">{{ comment.content }}</p>
+                        <form method="POST" action="{% url 'add_comment' note.id %}" class="reply-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                            <div class="reply-input-container">
+                                <textarea name="content" placeholder="Write a reply..." required
+                                    class="reply-input"></textarea>
+                                <button type="submit" class="submit-reply">Reply</button>
+                            </div>
+                        </form>
 
-    <ul>
-        {% for comment in note.comments.all %}
-        <li class="comment">
-            <strong>{{ comment.user.username }}</strong>: {{ comment.content }}
-            <form method="POST" action="{% url 'add_comment' note.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                <textarea name="content" placeholder="Reply..." required></textarea>
-                <button type="submit">Reply</button>
-            </form>
+                        {% for reply in comment.replies.all %}
+                        <div class="reply">
+                            <div class="reply-header">
+                                {% if reply.user.profile_picture %}
+                                <img src="{{ reply.user.profile_picture.url }}" alt="Replier Avatar"
+                                    class="replier-avatar">
+                                {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" alt="Replier Avatar"
+                                    class="replier-avatar">
+                                {% endif %}
+                                <span class="replier-name">{{ reply.user.username }}</span>
+                            </div>
+                            <p class="reply-content">{{ reply.content }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% empty %}
+                    <p class="no-comments">No comments yet. Be the first to comment!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
 
-            {% for reply in comment.replies.all %}
-            <ul class="reply">
-                <li><strong>{{ reply.user.username }}</strong>: {{ reply.content }}</li>
-            </ul>
-            {% endfor %}
-        </li>
-        {% empty %}
-        <p>No comments yet.</p>
-        {% endfor %}
-    </ul>
-
-    <a href="{% url 'notes_list' %}">Back to Notes</a>
+    <a href="{% url 'notes_list' %}" class="back-button">
+        <img src="{% static 'icons/back-icon.svg' %}" alt="Back" class="back-icon">
+        Back to Notes
+    </a>
+    <script src="{% static 'js/notes/note_detail.js' %}"></script>
+    <script src="{% static 'js/animated-bg.js' %}"></script>
+    <script>
+        // Pass static URLs to JavaScript
+        const ICONS = {
+            book: "{% static 'icons/login/book-bg.svg' %}",
+            boook: "{% static 'icons/login/book-2-bg.svg' %}",
+            map: "{% static 'icons/login/map-bg.svg' %}",
+            maap: "{% static 'icons/login/map-2-bg.svg' %}",
+            pen: "{% static 'icons/login/pen-bg.svg' %}",
+            glasses: "{% static 'icons/login/glasses-bg.svg' %}"
+        };
+    </script>
 </body>
 
 </html>

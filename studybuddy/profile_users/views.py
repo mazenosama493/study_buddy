@@ -10,6 +10,8 @@ from .models import Follow
 from notifications.signals import send_notification
 from django.contrib import messages
 from django.http import HttpResponse
+from notifications.models import Notification
+
 
 User = get_user_model()
 
@@ -131,7 +133,6 @@ def accept_follow_request(request, follow_id):
         send_notification(request.user, follow_request.follower, 'follow_accepted', message)
 
         messages.success(request, "Follow request accepted.")
-    Notification.objects.filter(user=request.user, follow_request=follow_request).delete()
     return redirect('notifications')
 
 @login_required
