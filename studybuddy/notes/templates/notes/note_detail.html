@@ -115,38 +115,31 @@
                 </form>
 
                 <div class="comments-list">
-                    {% for comment in note.comments.all %}
+                    {% for comment in top_level_comments %}
                     <div class="comment">
                         <div class="comment-header">
                             {% if comment.user.profile_picture %}
-                            <img src="{{ comment.user.profile_picture.url }}" alt="Commenter Avatar"
-                                class="commenter-avatar">
+                            <img src="{{ comment.user.profile_picture.url }}" alt="Commenter Avatar" class="commenter-avatar">
                             {% else %}
-                            <img src="{% static 'images/default-avatar.png' %}" alt="Commenter Avatar"
-                                class="commenter-avatar">
+                            <img src="{% static 'images/default-avatar.png' %}" alt="Commenter Avatar" class="commenter-avatar">
                             {% endif %}
                             <span class="commenter-name">{{ comment.user.username }}</span>
                         </div>
                         <p class="comment-content">{{ comment.content }}</p>
-                        <form method="POST" action="{% url 'add_comment' note.id %}" class="reply-form">
+                        <form method="POST" action="{% url 'add_reply' note.id comment.id %}" class="reply-form">
                             {% csrf_token %}
-                            <input type="hidden" name="parent_id" value="{{ comment.id }}">
                             <div class="reply-input-container">
-                                <textarea name="content" placeholder="Write a reply..." required
-                                    class="reply-input"></textarea>
+                                <textarea name="content" placeholder="Write a reply..." required class="reply-input"></textarea>
                                 <button type="submit" class="submit-reply">Reply</button>
                             </div>
                         </form>
-
                         {% for reply in comment.replies.all %}
                         <div class="reply">
                             <div class="reply-header">
                                 {% if reply.user.profile_picture %}
-                                <img src="{{ reply.user.profile_picture.url }}" alt="Replier Avatar"
-                                    class="replier-avatar">
+                                <img src="{{ reply.user.profile_picture.url }}" alt="Replier Avatar" class="replier-avatar">
                                 {% else %}
-                                <img src="{% static 'images/default-avatar.png' %}" alt="Replier Avatar"
-                                    class="replier-avatar">
+                                <img src="{% static 'images/default-avatar.png' %}" alt="Replier Avatar" class="replier-avatar">
                                 {% endif %}
                                 <span class="replier-name">{{ reply.user.username }}</span>
                             </div>

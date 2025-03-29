@@ -12,7 +12,6 @@ from django.contrib import messages
 from django.http import HttpResponse
 from notifications.models import Notification
 
-
 User = get_user_model()
 
 
@@ -55,6 +54,8 @@ def profile_view(request):
     notes = request.user.note_set.all()
     followers = Follow.objects.filter(following=request.user, status='accepted').count()
     followerss = Follow.objects.filter(following=request.user, status='accepted')
+    
+    
     return render(request, 'user_profiles/profile.html', {'profile': profile, 'notes': notes, 'followerss': followerss, 'followers': followers})
 
 
@@ -84,12 +85,7 @@ def edit_profile(request):
     })
 
 
-#@login_required
-#def follow_user(request, user_id):
-    user_to_follow = get_object_or_404(User, id=user_id)
-    if user_to_follow != request.user:
-        Follow.objects.get_or_create(follower=request.user, following=user_to_follow)
-    return redirect('public_profile', username=user_to_follow.username)
+
 
 
 @login_required
@@ -100,23 +96,26 @@ def unfollow_user(request, user_id):
 
 @login_required
 def follow_user(request, user_id):
-    """ Send a follow request instead of instantly following """
+    """ Follow a user instantly if their profile is public, otherwise send a follow request """
     user_to_follow = get_object_or_404(User, id=user_id)
+    profile = get_object_or_404(Profile, user=user_to_follow)
 
-    # Check if a follow request already exists
     follow_request, created = Follow.objects.get_or_create(
         follower=request.user,
         following=user_to_follow
     )
 
-    if not created:
-        messages.info(request, "Follow request already sent.")
+    if profile.public_profile:
+        follow_request.status = 'accepted'
+        follow_request.save()
+        messages.success(request, f"You are now following {user_to_follow.username}.")
     else:
-        # Send a notification to the user for the follow request
-        message = f"{request.user.username} has requested to follow you."
-        send_notification(request.user, user_to_follow, 'follow_request', message)
-
-        messages.success(request, "Follow request sent successfully.")
+        if created:
+            message = f"{request.user.username} has requested to follow you."
+            send_notification(request.user, user_to_follow, 'follow_request', message)
+            messages.success(request, "Follow request sent.")
+        else:
+            messages.info(request, "Follow request already sent.")
 
     return redirect('public_profile', username=user_to_follow.username)
 
@@ -129,10 +128,16 @@ def accept_follow_request(request, follow_id):
         follow_request.status = 'accepted'
         follow_request.save()
 
+        Notification.objects.filter(
+            sender=follow_request.follower, 
+            recipient=request.user, 
+            notification_type="follow_request"
+        ).delete()
+
         message = f"{request.user.username} has accepted your follow request."
         send_notification(request.user, follow_request.follower, 'follow_accepted', message)
-
         messages.success(request, "Follow request accepted.")
+
     return redirect('notifications')
 
 @login_required
@@ -142,13 +147,19 @@ def reject_follow_request(request, follow_id):
 
     if follow_request.status == 'pending':
         follow_request.status = 'rejected'
-        follow_request.delete()
+        follow_request.save()
+
+        Notification.objects.filter(
+            sender=follow_request.follower, 
+            recipient=request.user, 
+            notification_type="follow_request"
+        ).delete()
 
 
         message = f"{request.user.username} has rejected your follow request."
         send_notification(request.user, follow_request.follower, 'follow_rejected', message)
-
         messages.info(request, "Follow request rejected.")
+
 
     return redirect('notifications')
 
@@ -165,6 +176,15 @@ def remove_follower(request, follow_id):
         return redirect('profile_view')
     except Follow.DoesNotExist:
         return HttpResponse("Follower not found or already removed.", status=404)
+
+
+@login_required
+def toggle_profile_privacy(request):
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    profile.public_profile = not profile.public_profile
+    profile.save()
+    return redirect('profile_view')
+
 
 
 

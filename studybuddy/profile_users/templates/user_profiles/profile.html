@@ -8,6 +8,27 @@
 <body>
     <h2>{{ request.user.username }}'s Profile</h2>
 
+    <!-- Display Profile Privacy Status -->
+    <p><strong>Privacy:</strong> 
+        {% if profile.public_profile %}
+            Public
+        {% else %}
+            Private
+        {% endif %}
+    </p>
+
+    <!-- Privacy Toggle Button -->
+    <form action="{% url 'toggle_profile_privacy' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">
+            {% if profile.public_profile %}
+                Make Private
+            {% else %}
+                Make Public
+            {% endif %}
+        </button>
+    </form>
+
     <!-- Display Follower Count -->
     <p><strong>Followers:</strong> {{ followers }}</p>
 
@@ -37,9 +58,7 @@
     <p><strong>Bio:</strong> {{ profile.bio }}</p>
 
     <!-- Edit Profile Button -->
-    <a href="{% url 'edit_profile' %}">
-        <button>Edit Profile</button>
-    </a>
+    <a href="{% url 'edit_profile' %}"><button>Edit Profile</button></a>
 
     <!-- User's Notes Section -->
     <h3>My Notes</h3>

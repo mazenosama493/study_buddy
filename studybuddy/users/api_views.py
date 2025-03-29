@@ -12,8 +12,8 @@ class RegisterUserView(generics.CreateAPIView):
 
 # Login and Token Views (JWT)
 class CustomTokenObtainPairView(TokenObtainPairView):
-    pass  # Uses the default behavior
+    pass  
 
 class CustomTokenRefreshView(TokenRefreshView):
-    pass  # Uses the default behavior
+    pass  
 

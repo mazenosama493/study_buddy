@@ -5,6 +5,7 @@ from .forms import NoteForm
 from django.db import models
 from django.db.models import Q
 from django.contrib import messages
+from notifications.models import Notification
 
 
 @login_required
@@ -71,7 +72,12 @@ def notes_list(request):
 def note_detail(request, note_id):
     """ Show a single note """
     note = get_object_or_404(Note, id=note_id)
-    return render(request, 'notes/note_detail.html', {'note': note})
+    top_level_comments = note.comments.filter(
+        parent__isnull=True)  # Only top-level comments
+    return render(request, 'notes/note_detail.html', {
+        'note': note,
+        'top_level_comments': top_level_comments
+    })
 
 
 @login_required
@@ -83,7 +89,7 @@ def create_note(request):
             note = form.save(commit=False)
             note.author = request.user
             note.save()
-            form.save_m2m()  # Save shared_with users
+            form.save_m2m() 
             return redirect('notes_list')
     else:
         form = NoteForm()
@@ -119,7 +125,7 @@ def delete_note(request, note_id):
 
 @login_required
 def like_note(request, note_id):
-    """ Toggle like on a note """
+    """ Toggle like on a note and notify the author """
     note = get_object_or_404(Note, id=note_id)
     like, created = Like.objects.get_or_create(user=request.user, note=note)
 
@@ -128,7 +134,17 @@ def like_note(request, note_id):
     else:
         Dislike.objects.filter(user=request.user, note=note).delete()
 
+        if note.author != request.user:
+            Notification.objects.create(
+                recipient=note.author,  # **Receiver (Note's Author)**
+                sender=request.user,  # **Who liked the note**
+                note=note,
+                notification_type="like",
+                message = f"{request.user.username} liked your note: {note.title}."
+            )
+
     return redirect('note_detail', note_id=note.id)
+
 
 
 @login_required
@@ -142,21 +158,70 @@ def dislike_note(request, note_id):
         dislike.delete()  #
     else:
         Like.objects.filter(user=request.user, note=note).delete()
+        if note.author != request.user:
+            Notification.objects.create(
+                recipient=note.author, 
+                sender=request.user,  
+                note=note,
+                notification_type="dislike",
+                message = f"{request.user.username} disliked your note: {note.title}."
+            )
 
     return redirect('note_detail', note_id=note.id)
 
 
 @login_required
 def add_comment(request, note_id):
-    """ Add a comment or reply to a note """
+    """ Add a comment to a note """
     note = get_object_or_404(Note, id=note_id)
-    parent_id = request.POST.get('parent_id')
     content = request.POST.get('content')
 
     if content:
-        parent_comment = Comment.objects.get(
-            id=parent_id) if parent_id else None
-        Comment.objects.create(user=request.user, note=note,
-                               parent=parent_comment, content=content)
+        Comment.objects.create(user=request.user, note=note,content=content)
+        if note.author != request.user:
+            Notification.objects.create(
+                recipient=note.author,
+                sender=request.user,
+                note=note,
+                notification_type="comment",
+                message = f"{request.user.username} commented your note: {note.title}."
+            )
+
+    return redirect('note_detail', note_id=note.id)
+
+
+@login_required
+def add_reply(request, note_id, comment_id):
+    """ Add a reply to a comment """
+    note = get_object_or_404(Note, id=note_id)
+    parent_comment = get_object_or_404(Comment, id=comment_id, note=note)
+    content = request.POST.get('content')
+
+    if content:
+        # Create a reply and associate it with the parent comment
+        Comment.objects.create(
+            user=request.user,
+            note=note,
+            parent=parent_comment,
+            content=content
+        )
+        if parent_comment.user != request.user:
+            Notification.objects.create(
+                recipient=parent_comment.user,
+                sender=request.user,
+                note=note,
+                notification_type="comment",
+                message = f"{request.user.username} replied on your comment on this note: {note.title}."
+            )
+        
+        if parent_comment.user != request.user and note.author != request.user:
+            Notification.objects.create(
+                recipient=note.author,
+                sender=request.user,
+                note=note,
+                notification_type="comment",
+                message = f"{request.user.username} commented your note: {note.title}."
+            )
+
 
     return redirect('note_detail', note_id=note.id)

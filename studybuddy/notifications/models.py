@@ -17,6 +17,7 @@ class Notification(models.Model):
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    note = models.ForeignKey('notes.Note', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.sender} -> {self.recipient} ({self.notification_type})"

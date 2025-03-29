@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 def notifications_view(request):
     notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
 
-    # Attach follow requests manually
     for notification in notifications:
         if notification.notification_type == 'follow_request':
             follow_request = Follow.objects.filter(
