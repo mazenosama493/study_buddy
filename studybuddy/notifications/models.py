@@ -9,6 +9,7 @@ class Notification(models.Model):
         ('like', 'Like'),
         ('dislike', 'Dislike'),
         ('comment', 'Comment'),
+        ('new_note', 'New Note'),
     ]
 
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sent_notifications', on_delete=models.CASCADE)

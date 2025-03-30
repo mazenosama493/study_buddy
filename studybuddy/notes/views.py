@@ -89,7 +89,19 @@ def create_note(request):
             note = form.save(commit=False)
             note.author = request.user
             note.save()
-            form.save_m2m() 
+            form.save_m2m()
+            if note.show_on_profile:
+                message = f"{request.user.username} created a new note: {note.title} on his profile page."
+            else:
+                 message = f"{request.user.username} created a new note: {note.title}."
+            for follower in request.user.followers.all():
+                Notification.objects.create(
+                    recipient=follower.follower,
+                    sender=request.user,  
+                    note=note,
+                    notification_type="new_note",
+                    message=message,
+                )
             return redirect('notes_list')
     else:
         form = NoteForm()
@@ -225,3 +237,6 @@ def add_reply(request, note_id, comment_id):
 
 
     return redirect('note_detail', note_id=note.id)
+
+
+    
