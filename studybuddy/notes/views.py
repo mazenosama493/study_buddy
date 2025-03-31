@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models import Q
 from django.contrib import messages
 from notifications.models import Notification
+from .models import Note
 
 
 @login_required
@@ -14,42 +15,11 @@ def notes_list(request):
 
     user = request.user
     notes = Note.objects.filter(show_on_profile=False)
+    GRADE_CHOICES = Note.GRADE_CHOICES
+    SUBJECT_CHOICES = Note.SUBJECT_CHOICES
 
     # Define grade and subject choices correctly as (value, label) tuples
-    GRADE_CHOICES = [
-        ('first', 'Grade 1'),
-        ('second', 'Grade 2'),
-        ('third', 'Grade 3'),
-        ('fourth', 'Grade 4'),
-        ('fifth', 'Grade 5'),
-        ('sixth', 'Grade 6'),
-        ('seventh', 'Grade 7'),
-        ('eighth', 'Grade 8'),
-        ('ninth', 'Grade 9'),
-        ('tenth', 'Grade 10'),
-        ('eleventh', 'Grade 11'),
-        ('twelfth', 'Grade 12'),
-    ]
-
-    SUBJECT_CHOICES = [
-        ("mathematics", "Mathematics"), ("science", "Science"),
-        ("history", "History"), ("english", "English"),
-        ("computers", "Computer Science"), ("arts", "Arts")
-    ]
-
-    # Get filter values from request
-    grade_filter = request.GET.get('grade_level', '')
-    subject_filter = request.GET.get('subject', '')
-    username_filter = request.GET.get('username', '')
-
-    # Apply filters if selected
-    if grade_filter:
-        notes = notes.filter(grade_level=grade_filter)
-    if subject_filter:
-        notes = notes.filter(subject=subject_filter)
-    if username_filter:
-        notes = notes.filter(author__username__icontains=username_filter)
-
+    notes , grade_filter, subject_filter, username_filter = filter_notes(request, notes)
     # Prioritize notes based on user role
     if user.role == 'student':
         notes = sorted(notes, key=lambda note: (
@@ -237,6 +207,23 @@ def add_reply(request, note_id, comment_id):
 
 
     return redirect('note_detail', note_id=note.id)
+
+def filter_notes(request, notes):
+    grade_filter = request.GET.get('grade_level', '')
+    subject_filter = request.GET.get('subject', '')
+    username_filter = request.GET.get('username', '')
+
+    # Apply filters if selected
+    if grade_filter:
+        notes = notes.filter(grade_level=grade_filter)
+    if subject_filter:
+        notes = notes.filter(subject=subject_filter)
+    if username_filter:
+        notes = notes.filter(author__username__icontains=username_filter)
+
+    return notes, grade_filter, subject_filter, username_filter
+
+    
 
 
     

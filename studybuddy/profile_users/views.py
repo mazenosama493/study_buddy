@@ -11,6 +11,7 @@ from notifications.signals import send_notification
 from django.contrib import messages
 from django.http import HttpResponse
 from notifications.models import Notification
+from notes.models import Note
 
 User = get_user_model()
 
@@ -19,6 +20,8 @@ def public_profile_view(request, username):
     """ View a public profile """
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(Profile, user=user)
+    GRADE_CHOICES = Note.GRADE_CHOICES
+    SUBJECT_CHOICES = Note.SUBJECT_CHOICES
     
     # Check if there is an accepted follow relationship
     follow_instance = Follow.objects.filter(follower=request.user, following=user).first()
@@ -37,26 +40,35 @@ def public_profile_view(request, username):
     if user == request.user:
         return redirect('profile_view')
 
+    notes, grade_filter, subject_filter =filter_notes(notes, request)
+
     return render(request, 'user_profiles/public_profile.html', {
         'profile': profile,
         'notes': notes,
+        'grade_filter': grade_filter,
+        'subject_filter': subject_filter,
         'is_following': is_following,
         'is_pending': is_pending,
-        'count_followers': count_followers
+        'count_followers': count_followers,
+        'GRADE_CHOICES': GRADE_CHOICES,
+        'SUBJECT_CHOICES': SUBJECT_CHOICES,
         
     })
 
 
 @login_required
 def profile_view(request):
+    GRADE_CHOICES = Note.GRADE_CHOICES
+    SUBJECT_CHOICES = Note.SUBJECT_CHOICES
     """ Display user's profile and notes """
     profile, created = Profile.objects.get_or_create(user=request.user)
     notes = request.user.note_set.all()
+    notes, grade_filter, subject_filter =filter_notes(notes, request)
     followers = Follow.objects.filter(following=request.user, status='accepted').count()
     followerss = Follow.objects.filter(following=request.user, status='accepted')
     
     
-    return render(request, 'user_profiles/profile.html', {'profile': profile, 'notes': notes, 'followerss': followerss, 'followers': followers})
+    return render(request, 'user_profiles/profile.html', {'profile': profile, 'notes': notes, 'followerss': followerss, 'followers': followers,'GRADE_CHOICES': GRADE_CHOICES, 'SUBJECT_CHOICES': SUBJECT_CHOICES, 'grade_filter': grade_filter, 'subject_filter': subject_filter})
 
 
 @login_required
@@ -109,6 +121,8 @@ def follow_user(request, user_id):
         follow_request.status = 'accepted'
         follow_request.save()
         messages.success(request, f"You are now following {user_to_follow.username}.")
+        message = f"{request.user.username} is now following you."
+        send_notification(request.user, user_to_follow, 'follow', message)
     else:
         if created:
             message = f"{request.user.username} has requested to follow you."
@@ -184,6 +198,22 @@ def toggle_profile_privacy(request):
     profile.public_profile = not profile.public_profile
     profile.save()
     return redirect('profile_view')
+
+
+def filter_notes(notes, request):
+    
+    """Filter notes by grade level and subject"""
+    grade_filter = request.GET.get('grade_level', '')
+    subject_filter = request.GET.get('subject', '')
+
+    if grade_filter:
+        notes = notes.filter(grade_level=grade_filter)
+    if subject_filter:
+        notes = notes.filter(subject=subject_filter)
+    
+    return notes, grade_filter, subject_filter
+
+
 
 
 

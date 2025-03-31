@@ -4,6 +4,7 @@ from django.conf import settings
 class Notification(models.Model):
     NOTIFICATION_TYPES = [
         ('follow_request', 'Follow Request'),
+        ('follow', 'Follow'),
         ('follow_accepted', 'Follow Accepted'),
         ('follow_rejected', 'Follow Rejected'),
         ('like', 'Like'),
