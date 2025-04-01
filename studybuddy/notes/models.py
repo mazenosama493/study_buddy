@@ -31,8 +31,8 @@ class Note(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_public = models.BooleanField(default=False)
-    grade_level = models.CharField(max_length=50,choices=GRADE_CHOICES, default='Grade 1') 
-    subject = models.CharField(max_length=50, choices=SUBJECT_CHOICES, default='math') 
+    grade_level = models.CharField(max_length=50,choices=GRADE_CHOICES, default='first') 
+    subject = models.CharField(max_length=50, choices=SUBJECT_CHOICES, default='mathematics') 
     show_on_profile = models.BooleanField(default=False)
 
 

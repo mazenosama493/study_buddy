@@ -20,6 +20,11 @@ def public_profile_view(request, username):
     """ View a public profile """
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(Profile, user=user)
+    role=get_object_or_404(User, username=username).role
+    if role == 'student':
+        form=grade_level=get_object_or_404(User, username=username).grade_level
+    else:
+        form=subject_category=get_object_or_404(User, username=username).subject_category
     GRADE_CHOICES = Note.GRADE_CHOICES
     SUBJECT_CHOICES = Note.SUBJECT_CHOICES
     
@@ -32,9 +37,9 @@ def public_profile_view(request, username):
 
     # Show notes only if the follow request is accepted
     if is_following:
-        notes = user.note_set.all()
+        notes = user.note_set.all().order_by('-created_at')
     else:
-        notes = user.note_set.filter(show_on_profile=True)  # Show only public notes
+        notes = user.note_set.filter(show_on_profile=True).order_by('-created_at') # Show only public notes
 
     # Redirect to own profile if user is viewing themselves
     if user == request.user:
@@ -52,6 +57,8 @@ def public_profile_view(request, username):
         'count_followers': count_followers,
         'GRADE_CHOICES': GRADE_CHOICES,
         'SUBJECT_CHOICES': SUBJECT_CHOICES,
+        'form': form,
+        'role': role
         
     })
 
@@ -62,13 +69,19 @@ def profile_view(request):
     SUBJECT_CHOICES = Note.SUBJECT_CHOICES
     """ Display user's profile and notes """
     profile, created = Profile.objects.get_or_create(user=request.user)
-    notes = request.user.note_set.all()
+    notes = request.user.note_set.all().order_by('-created_at')
+    role=get_object_or_404(User, username=request.user.username).role
+    if role == 'student':
+        form=grade_level=get_object_or_404(User, username=request.user.username).grade_level
+    else:
+        form=subject_category=get_object_or_404(User, username=request.user.username).subject_category
     notes, grade_filter, subject_filter =filter_notes(notes, request)
-    followers = Follow.objects.filter(following=request.user, status='accepted').count()
+    followers= Follow.objects.filter(following=request.user, status='accepted').count()
     followerss = Follow.objects.filter(following=request.user, status='accepted')
     
     
-    return render(request, 'user_profiles/profile.html', {'profile': profile, 'notes': notes, 'followerss': followerss, 'followers': followers,'GRADE_CHOICES': GRADE_CHOICES, 'SUBJECT_CHOICES': SUBJECT_CHOICES, 'grade_filter': grade_filter, 'subject_filter': subject_filter})
+    
+    return render(request, 'user_profiles/profile.html', {'profile': profile, 'notes': notes, 'followerss': followerss, 'followers': followers,'GRADE_CHOICES': GRADE_CHOICES, 'SUBJECT_CHOICES': SUBJECT_CHOICES, 'grade_filter':grade_filter, 'subject_filter': subject_filter,'form': form , 'role': role})
 
 
 @login_required
@@ -95,9 +108,6 @@ def edit_profile(request):
         'profile_form': profile_form,
         'picture_form': picture_form
     })
-
-
-
 
 
 @login_required
@@ -207,9 +217,9 @@ def filter_notes(notes, request):
     subject_filter = request.GET.get('subject', '')
 
     if grade_filter:
-        notes = notes.filter(grade_level=grade_filter)
+        notes = notes.filter(grade_level=grade_filter).order_by('-created_at')
     if subject_filter:
-        notes = notes.filter(subject=subject_filter)
+        notes = notes.filter(subject=subject_filter).order_by('-created_at')
     
     return notes, grade_filter, subject_filter
 

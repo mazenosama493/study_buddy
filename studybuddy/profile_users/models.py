@@ -10,6 +10,7 @@ class Profile(models.Model):
     bio = models.TextField(blank=True)
     public_profile = models.BooleanField(default=True)
 
+
     def __str__(self):
         return self.user.username
 class Follow(models.Model):

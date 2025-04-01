@@ -23,6 +23,6 @@ class CustomUserAdminForm(forms.ModelForm):
 class CustomUserAdmin(admin.ModelAdmin):
     form = CustomUserAdminForm
     list_display = ('username', 'email', 'role', 'subject_category', 'grade_level')
-    fields = ('username', 'email', 'password', 'role', 'subject_category', 'grade_level', 'bio', 'profile_picture')
+    fields = ('username', 'email', 'password', 'role', 'subject_category', 'grade_level', 'profile_picture')
 
 admin.site.register(CustomUser, CustomUserAdmin)

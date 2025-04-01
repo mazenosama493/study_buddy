@@ -1,39 +1,19 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.exceptions import ValidationError
+from notes.models import Note
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('student', 'Student'),
         ('teacher', 'Teacher'),
     ]
-    SUBJECT_CATEGORIES = [
-        ('math', 'Mathematics'),
-        ('science', 'Science'),
-        ('history', 'History'),
-        ('english', 'English'),
-        ('computers', 'Computer Science'),
-        ('arts', 'Arts'),
-    ]
-    GRADE_LEVELS = [
-        ('first', 'First Grade'),
-        ('second', 'Second Grade'),
-        ('third', 'Third Grade'),
-        ('fourth', 'Fourth Grade'),
-        ('fifth', 'Fifth Grade'),
-        ('sixth', 'Sixth Grade'),
-        ('seventh', 'Seventh Grade'),
-        ('eighth', 'Eighth Grade'),
-        ('ninth', 'Ninth Grade'),
-        ('tenth', 'Tenth Grade'),
-        ('eleventh', 'Eleventh Grade'),
-        ('twelfth', 'Twelfth Grade'),
-    ]
-    subject_category = models.CharField(max_length=20, choices=SUBJECT_CATEGORIES, blank=True, null=True)
+    SUBJECT_CATEGORIES = Note.SUBJECT_CHOICES
+    GRADE_LEVELS = Note.GRADE_CHOICES
+    subject_category = models.CharField(max_length=20, choices=SUBJECT_CATEGORIES, blank=True, null=True , default='mathematics')
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
-    grade_level = models.CharField(max_length=20, choices=GRADE_LEVELS, blank=True, null=True)
+    grade_level = models.CharField(max_length=20, choices=GRADE_LEVELS, blank=True, null=True, default='first')
     email = models.EmailField(unique=True)
-    bio = models.TextField(blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
 
