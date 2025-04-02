@@ -98,9 +98,13 @@ def delete_note(request, note_id):
     note = get_object_or_404(Note, id=note_id, author=request.user)
 
     if request.method == "POST":  # If user confirms deletion
+        if note.show_on_profile:
+            redirect_url = 'profile_view'
+        else:
+            redirect_url = 'notes_list'
         note.delete()
         messages.success(request, "Your note has been successfully deleted.")
-        return redirect('notes_list')
+        return redirect(redirect_url)
 
     return render(request, 'notes/confirm_delete.html', {'note': note})
 

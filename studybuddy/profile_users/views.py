@@ -157,9 +157,12 @@ def accept_follow_request(request, follow_id):
             recipient=request.user, 
             notification_type="follow_request"
         ).delete()
+        follow_request.delete()
 
         message = f"{request.user.username} has accepted your follow request."
+        message2=f"{follow_request.follower.username} is now following you."
         send_notification(request.user, follow_request.follower, 'follow_accepted', message)
+        send_notification(follow_request.follower, request.user, 'follow', message2)
         messages.success(request, "Follow request accepted.")
 
     return redirect('notifications')
@@ -178,20 +181,17 @@ def reject_follow_request(request, follow_id):
             recipient=request.user, 
             notification_type="follow_request"
         ).delete()
+        follow_request.delete()
 
 
         message = f"{request.user.username} has rejected your follow request."
+        message2=f"{follow_request.follower.username} request has been rejected."
         send_notification(request.user, follow_request.follower, 'follow_rejected', message)
+        send_notification(follow_request.follower, request.user, 'follow_rejected', message2)
         messages.info(request, "Follow request rejected.")
 
 
     return redirect('notifications')
-
-def followers_view(request):
-    """ Display a list of followers """
-    followers = Follow.objects.filter(following=request.user, status='accepted')
-    return render(request, 'user_profiles/followers.html', {'followers': followers})
-
 def remove_follower(request, follow_id):
     """ Remove a follower """
     try:

@@ -20,6 +20,7 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     note = models.ForeignKey('notes.Note', null=True, blank=True, on_delete=models.CASCADE)
+    seen = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.sender} -> {self.recipient} ({self.notification_type})"

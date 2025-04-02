@@ -8,12 +8,19 @@
 <body>
     <h2>Notifications</h2>
 
+    <!-- Button to mark all notifications as seen -->
+    <form action="{% url 'mark_notifications_as_seen' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Mark All as Seen</button>
+    </form>
+
     <ul>
         {% for notification in notifications %}
-            <li>
+            <li style="{% if not notification.seen %} font-weight: bold; {% endif %}">
                 <p>{{ notification.message }}</p>
                 <small>{{ notification.created_at }}</small>
 
+                <!-- If the notification is a follow request, show Accept/Reject buttons -->
                 {% if notification.notification_type == "follow_request" and notification.follow_request_id %}
                     <form action="{% url 'accept_follow_request' notification.follow_request_id %}" method="post" style="display:inline;">
                         {% csrf_token %}
@@ -22,6 +29,14 @@
                     <form action="{% url 'reject_follow_request' notification.follow_request_id %}" method="post" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit">Reject</button>
+                    </form>
+                {% endif %}
+
+                <!-- Mark as seen button for each unseen notification -->
+                {% if not notification.seen %}
+                    <form action="{% url 'mark_single_notification_as_seen' notification.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">Mark as Seen</button>
                     </form>
                 {% endif %}
             </li>

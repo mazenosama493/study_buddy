@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import profile_view, edit_profile, public_profile_view, follow_user, accept_follow_request, reject_follow_request, followers_view,remove_follower, toggle_profile_privacy
+from .views import profile_view, edit_profile, public_profile_view, follow_user, accept_follow_request, reject_follow_request,remove_follower, toggle_profile_privacy
 from . import views
 
 urlpatterns = [
@@ -11,6 +11,5 @@ urlpatterns = [
     path('unfollow/<int:user_id>/', views.unfollow_user, name='unfollow_user'),
     path('accept-follow/<int:follow_id>/', accept_follow_request, name='accept_follow_request'),
     path('reject-follow/<int:follow_id>/', reject_follow_request, name='reject_follow_request'),
-    path('followers/', views.followers_view, name='followers_view'),
     path('remove-follower/<int:follow_id>/', remove_follower, name='remove_follower'),
 ]
