@@ -33,6 +33,24 @@ body {
     animation: fadeIn 0.5s ease-out;
 }
 
+.site-header a {
+    text-decoration: none;
+}
+
+.notification-icon {
+    padding: 0.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.notification-icon:hover {
+    box-shadow: 0 0 15px var(--primary-color);
+    border-color: var(--primary-color);
+    transform: scale(1.1);
+}
+
 .logo-container img {
     width: 50px;
     height: 50px;
@@ -45,10 +63,10 @@ body {
 
 .site-title {
     font-size: 1.5em;
-        background: linear-gradient(45deg, var(--primary-color), var(--primary-hover));
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-hover));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .header-actions {
@@ -311,6 +329,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .note-content a {
     text-decoration: none;
     text-overflow: ellipsis;
@@ -318,7 +337,6 @@ body {
 
 .note-content h1 {
     font-size: 1.5em;
-    text-decoration: none !important;
     text-overflow: ellipsis;
     color: var(--text-primary);
     transition: color 0.3s ease;

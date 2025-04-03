@@ -7,20 +7,18 @@ from django.db.models import Q
 from django.contrib import messages
 from notifications.models import Notification
 from .models import Note
-
+from notifications.views import has_unseen_notifications
 
 @login_required
 def notes_list(request):
     """ Show all notes, allow filtering by grade, subject, and username """
-
     user = request.user
     notes = Note.objects.filter(show_on_profile=False)
     GRADE_CHOICES = Note.GRADE_CHOICES
     SUBJECT_CHOICES = Note.SUBJECT_CHOICES
 
-    # Define grade and subject choices correctly as (value, label) tuples
-    notes , grade_filter, subject_filter, username_filter = filter_notes(request, notes)
-    # Prioritize notes based on user role
+    notes, grade_filter, subject_filter, username_filter = filter_notes(request, notes)
+    
     if user.role == 'student':
         notes = sorted(notes, key=lambda note: (
             note.grade_level != user.grade_level, -note.created_at.timestamp()))
@@ -28,25 +26,27 @@ def notes_list(request):
         notes = sorted(notes, key=lambda note: (
             note.subject != user.subject_category, -note.created_at.timestamp()))
 
-    return render(request, 'notes/notes_list.html', {
+    context = {
         'notes': notes,
         'grade_filter': grade_filter,
         'subject_filter': subject_filter,
         'username_filter': username_filter,
         'GRADE_CHOICES': GRADE_CHOICES,
-        'SUBJECT_CHOICES': SUBJECT_CHOICES
-    })
+        'SUBJECT_CHOICES': SUBJECT_CHOICES,
+        'has_unseen_notifications': has_unseen_notifications(request.user)
+    }
+    return render(request, 'notes/notes_list.html', context)
 
 
 @login_required
 def note_detail(request, note_id):
     """ Show a single note """
     note = get_object_or_404(Note, id=note_id)
-    top_level_comments = note.comments.filter(
-        parent__isnull=True)  # Only top-level comments
+    top_level_comments = note.comments.filter(parent__isnull=True)  # Only top-level comments
     return render(request, 'notes/note_detail.html', {
         'note': note,
-        'top_level_comments': top_level_comments
+        'top_level_comments': top_level_comments,
+        'has_unseen_notifications': has_unseen_notifications(request.user)
     })
 
 

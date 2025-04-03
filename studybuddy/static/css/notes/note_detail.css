@@ -52,7 +52,7 @@ audio.media-content {
 
 body {
     background: radial-gradient(circle at center, var(--background-light) 0%, var(--background-dark) 70%),
-                radial-gradient(circle at 20% 80%, rgba(1, 191, 113, 0.1) 0%, transparent 40%);
+        radial-gradient(circle at 20% 80%, rgba(1, 191, 113, 0.1) 0%, transparent 40%);
     font-family: 'Inter', sans-serif;
     color: var(--text-primary);
     min-height: 100vh;
@@ -63,7 +63,7 @@ body {
 }
 
 /* Header Styles */
-.site-header {
+#site-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -79,10 +79,18 @@ body {
     animation: fadeIn 0.5s ease-out;
 }
 
-.site-logo {
+#site-header a {
+    text-decoration: none;
+}
+
+.logo-container img {
     width: 50px;
     height: 50px;
     transition: transform 0.3s ease;
+}
+
+.logo-container img:hover {
+    transform: scale(1.1);
 }
 
 .site-title {
@@ -91,6 +99,43 @@ body {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.logout-button {
+    padding: 0.5rem 1.25rem;
+    background: var(--gradient-glass);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.logout-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border-color: var(--primary-color);
+}
+
+.profile-icon-container img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.profile-icon-container img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--primary-color);
 }
 
 .author-avatar {
@@ -379,6 +424,13 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

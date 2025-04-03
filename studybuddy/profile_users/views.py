@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Profile
-from .forms import ProfileForm, UserEditForm
+from .forms import ProfileForm, UserEditForm, StudentEditForm, TeacherEditForm
 from notes import models
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from notifications.models import Notification
 from notes.models import Note
+from notifications.views import has_unseen_notifications
 
 User = get_user_model()
 
@@ -28,11 +29,11 @@ def public_profile_view(request, username):
     GRADE_CHOICES = Note.GRADE_CHOICES
     SUBJECT_CHOICES = Note.SUBJECT_CHOICES
     
-    # Check if there is an accepted follow relationship
+    # Check if there is a follow relationship
     follow_instance = Follow.objects.filter(follower=request.user, following=user).first()
     
     is_following = follow_instance and follow_instance.status == 'accepted'
-    is_pending = follow_instance and not follow_instance.status == 'pending'
+    is_pending = follow_instance and follow_instance.status == 'pending'
     count_followers = Follow.objects.filter(following=user, status='accepted').count()
 
     # Show notes only if the follow request is accepted
@@ -57,6 +58,7 @@ def public_profile_view(request, username):
         'count_followers': count_followers,
         'GRADE_CHOICES': GRADE_CHOICES,
         'SUBJECT_CHOICES': SUBJECT_CHOICES,
+        'has_unseen_notifications': has_unseen_notifications(request.user),
         'form': form,
         'role': role
         
@@ -81,32 +83,60 @@ def profile_view(request):
     
     
     
-    return render(request, 'user_profiles/profile.html', {'profile': profile, 'notes': notes, 'followerss': followerss, 'followers': followers,'GRADE_CHOICES': GRADE_CHOICES, 'SUBJECT_CHOICES': SUBJECT_CHOICES, 'grade_filter':grade_filter, 'subject_filter': subject_filter,'form': form , 'role': role})
+    return render(request, 'user_profiles/profile.html',
+     {
+        'profile': profile,
+        'notes': notes,
+        'followerss': followerss,
+        'followers': followers,
+        'GRADE_CHOICES': GRADE_CHOICES,
+        'SUBJECT_CHOICES': SUBJECT_CHOICES,
+        'grade_filter':grade_filter,
+        'subject_filter': subject_filter,
+        'form': form ,
+        'has_unseen_notifications': has_unseen_notifications(request.user),
+        'role': role
+     })
 
 
 @login_required
 def edit_profile(request):
-    """ Allow user to edit profile details and update profile picture """
+    """ Allow user to edit profile details, username, profile picture, and role-specific fields """
     profile = Profile.objects.get(user=request.user)
     user = request.user
-
+    role = user.role
+    
     if request.method == "POST":
         profile_form = ProfileForm(request.POST, instance=profile)
-        picture_form = UserEditForm(request.POST, request.FILES, instance=user)
-
-        if profile_form.is_valid() and picture_form.is_valid():
+        user_form = UserEditForm(request.POST, request.FILES, instance=user)
+        
+        # Role-specific form
+        if role == 'student':
+            role_form = StudentEditForm(request.POST, instance=user)
+        else:  # teacher
+            role_form = TeacherEditForm(request.POST, instance=user)
+            
+        if profile_form.is_valid() and user_form.is_valid() and role_form.is_valid():
             profile_form.save()
-            picture_form.save()
-            # ✅ Redirect to profile after saving
+            user_form.save()
+            role_form.save()
             return redirect('profile_view')
-
     else:
         profile_form = ProfileForm(instance=profile)
-        picture_form = UserEditForm(instance=user)
+        user_form = UserEditForm(instance=user)
+        
+        # Role-specific form
+        if role == 'student':
+            role_form = StudentEditForm(instance=user)
+        else:  # teacher
+            role_form = TeacherEditForm(instance=user)
 
     return render(request, 'user_profiles/edit_profile.html', {
         'profile_form': profile_form,
-        'picture_form': picture_form
+        'user_form': user_form,
+        'role_form': role_form,
+        'role': role,
+        'has_unseen_notifications': has_unseen_notifications(request.user)
     })
 
 
@@ -117,14 +147,41 @@ def unfollow_user(request, user_id):
     return redirect('public_profile', username=user_to_unfollow.username)
 
 @login_required
+def cancel_follow_request(request, user_id):
+    """ Cancel a pending follow request """
+    user_to_unfollow = get_object_or_404(User, id=user_id)
+    follow_request = get_object_or_404(Follow, follower=request.user, following=user_to_unfollow, status='pending')
+    
+    # Delete the follow request
+    follow_request.delete()
+    
+    # Delete any related notifications
+    Notification.objects.filter(
+        sender=request.user, 
+        recipient=user_to_unfollow, 
+        notification_type="follow_request"
+    ).delete()
+    
+    messages.info(request, "Follow request canceled.")
+    return redirect('public_profile', username=user_to_unfollow.username)
+
+@login_required
 def follow_user(request, user_id):
     """ Follow a user instantly if their profile is public, otherwise send a follow request """
     user_to_follow = get_object_or_404(User, id=user_id)
     profile = get_object_or_404(Profile, user=user_to_follow)
 
+    # Delete any existing rejected follow request
+    Follow.objects.filter(
+        follower=request.user,
+        following=user_to_follow,
+        status='rejected'
+    ).delete()
+
     follow_request, created = Follow.objects.get_or_create(
         follower=request.user,
-        following=user_to_follow
+        following=user_to_follow,
+        defaults={'status': 'pending'}
     )
 
     if profile.public_profile:
@@ -157,7 +214,6 @@ def accept_follow_request(request, follow_id):
             recipient=request.user, 
             notification_type="follow_request"
         ).delete()
-        follow_request.delete()
 
         message = f"{request.user.username} has accepted your follow request."
         message2=f"{follow_request.follower.username} is now following you."
@@ -181,7 +237,6 @@ def reject_follow_request(request, follow_id):
             recipient=request.user, 
             notification_type="follow_request"
         ).delete()
-        follow_request.delete()
 
 
         message = f"{request.user.username} has rejected your follow request."

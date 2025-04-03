@@ -1,50 +1,119 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{% static 'images/fav32.png' %}">
+    <link rel="stylesheet" href="{% static 'css/root.css' %}">
+    <link rel="stylesheet" href="{% static 'css/notifications/notifications.css' %}">
     <title>Notifications</title>
 </head>
 <body>
-    <h2>Notifications</h2>
+    <div class="background-animate">
+        <!-- will be Passed throw js -->
+    </div>
+    <header id="site-header">
+        <div class="logo-container">
+            <a href="{% url 'notes_list' %}">
+                <img src="{% static 'images/logo-2-trans.png' %}" alt="Study Buddy Logo" class="site-logo">
+            </a>
+        </div>
+        <a href="{% url 'notes_list' %}">
+            <h1 class="site-title">Study Buddy</h1>
+        </a>
+        <div class="header-actions">
+            <a href="{% url 'notifications' %}">
+                <div class="loader">
+                    <img src="{% static 'icons/notify.svg' %}" alt="Notifications Icon">
+                    {% if has_unseen_notifications %}
+                    <div class="point"></div>
+                    {% endif %}
+                </div>
+            </a>
+            <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+            <div class="profile-icon-container">
+                <a href="{% url 'profile_view' %}">
+                    {% if request.user.profile_picture %}
+                    <img src="{{ request.user.profile_picture.url }}" alt="Profile Avatar" class="author-avatar">
+                    {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar" class="author-avatar">
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </header>
 
-    <!-- Button to mark all notifications as seen -->
-    <form action="{% url 'mark_notifications_as_seen' %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Mark All as Seen</button>
-    </form>
+    <div class="notifications-container">
+        <div class="notifications-header">
+            <h2>Notifications</h2>
+            <form action="{% url 'mark_notifications_as_seen' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="mark-all-seen">Mark All as Seen</button>
+            </form>
+        </div>
 
-    <ul>
-        {% for notification in notifications %}
-            <li style="{% if not notification.seen %} font-weight: bold; {% endif %}">
-                <p>{{ notification.message }}</p>
-                <small>{{ notification.created_at }}</small>
+        <ul class="notifications-list">
+            {% for notification in notifications %}
+                <li class="notification-item {% if not notification.seen %}unseen{% endif %}">
+                    <div class="notification-content">
+                        <p class="notification-message">{{ notification.message }}</p>
+                        <small class="notification-time">{{ notification.created_at }}</small>
+                    </div>
 
-                <!-- If the notification is a follow request, show Accept/Reject buttons -->
-                {% if notification.notification_type == "follow_request" and notification.follow_request_id %}
-                    <form action="{% url 'accept_follow_request' notification.follow_request_id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit">Accept</button>
-                    </form>
-                    <form action="{% url 'reject_follow_request' notification.follow_request_id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit">Reject</button>
-                    </form>
-                {% endif %}
+                    <div class="notification-actions">
+                        {% if notification.notification_type == 'new_note' or notification.notification_type == 'comment' or notification.notification_type == 'like' or notification.notification_type == 'dislike' %}
+                            <a href="{% url 'note_detail' notification.note.id %}" class="action-button view-button">View</a>
+                        {% endif %}
+                        {% if notification.notification_type == "follow_request" %}
+                            {% for follow in notification.sender.following.all %}
+                                {% if follow.following == request.user and follow.status == 'pending' %}
+                                    <form action="{% url 'accept_follow_request' follow.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-button accept-button">Accept</button>
+                                    </form>
+                                    <form action="{% url 'reject_follow_request' follow.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-button reject-button">Reject</button>
+                                    </form>
+                                    {% endif %}
+                                {% if forloop.first %}{% comment %}Using first iteration only{% endcomment %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
 
-                <!-- Mark as seen button for each unseen notification -->
-                {% if not notification.seen %}
-                    <form action="{% url 'mark_single_notification_as_seen' notification.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit">Mark as Seen</button>
-                    </form>
-                {% endif %}
-            </li>
-        {% empty %}
-            <p>No notifications yet.</p>
-        {% endfor %}
-    </ul>
+                        {% if not notification.seen %}
+                            <form action="{% url 'mark_single_notification_as_seen' notification.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="action-button mark-seen-button">Mark as Seen</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </li>
+            {% empty %}
+                <div class="no-notifications">
+                    <p>No notifications yet.</p>
+                </div>
+            {% endfor %}
+        </ul>
 
-    <a href="{% url 'profile_view' %}"><button>Back to Profile</button></a>
+        <a href="{% url 'profile_view' %}" class="back-button">
+            <img src="{% static 'icons/back-icon.svg' %}" alt="Back" class="back-icon">
+            Back to Profile
+        </a>
+    </div>
+
+    <script src="{% static 'js/animated-bg.js' %}"></script>
+    <script>
+        // Pass static URLs to JavaScript
+        const ICONS = {
+            book: "{% static 'icons/login/book-bg.svg' %}",
+            boook: "{% static 'icons/login/book-2-bg.svg' %}",
+            map: "{% static 'icons/login/map-bg.svg' %}",
+            maap: "{% static 'icons/login/map-2-bg.svg' %}",
+            pen: "{% static 'icons/login/pen-bg.svg' %}",
+            glasses: "{% static 'icons/login/glasses-bg.svg' %}"
+        };
+    </script>
 </body>
 </html>

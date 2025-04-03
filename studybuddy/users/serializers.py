@@ -20,3 +20,26 @@ class UserSerializer(serializers.ModelSerializer):
             profile_picture=validated_data.get('profile_picture', None),
         )
         return user
+
+from rest_framework import serializers
+from .models import CustomUser
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'profile_picture', 'grade_level', 'subject_category']
+
+    def validate(self, data):
+        """ Ensure students and teachers have the correct fields updated """
+        user = self.instance  # Get the current user
+
+        # If user is a student, they should not update subject_category
+        if user.role == 'student' and 'subject_category' in data:
+            raise serializers.ValidationError("Students cannot select a subject category.")
+
+        # If user is a teacher, they should not update grade_level
+        if user.role == 'teacher' and 'grade_level' in data:
+            raise serializers.ValidationError("Teachers cannot select a grade level.")
+
+        return data
+

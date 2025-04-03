@@ -17,7 +17,6 @@ class Notification(models.Model):
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='received_notifications', on_delete=models.CASCADE)
     notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
     message = models.TextField()
-    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     note = models.ForeignKey('notes.Note', null=True, blank=True, on_delete=models.CASCADE)
     seen = models.BooleanField(default=False)

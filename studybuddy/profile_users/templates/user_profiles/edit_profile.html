@@ -1,28 +1,189 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{% static 'images/fav32.png' %}">
+    <link rel="stylesheet" href="{% static 'css/root.css' %}">
+    <link rel="stylesheet" href="{% static 'css/profile/edit_profile.css' %}">
     <title>Edit Profile</title>
 </head>
 
 <body>
-    <h2>Edit Profile</h2>
+    <div class="background-animate">
+        <!-- will be Passed throw js -->
+    </div>
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+    <header id="site-header">
+        <div class="logo-container">
+            <a href="{% url 'notes_list' %}">
+                <img src="{% static 'images/logo-2-trans.png' %}" alt="Study Buddy Logo" class="site-logo">
+            </a>
+        </div>
+        <a href="{% url 'notes_list' %}">
+            <h1 class="site-title">Study Buddy</h1>
+        </a>
+        <div class="header-actions">
+            <a href="{% url 'notifications' %}">
+                <div class="loader">
+                    <img src="{% static 'icons/notify.svg' %}" alt="Notifications Icon">
+                    {% if has_unseen_notifications %}
+                    <div class="point"></div>
+                    {% endif %}
+                </div>
+            </a>
+            <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+            
+            <div class="profile-icon-container">
+                <a href="{% url 'profile_view' %}">
+                    {% if request.user.profile_picture %}
+                    <img src="{{ request.user.profile_picture.url }}" alt="Profile Avatar" class="author-avatar">
+                    {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar" class="author-avatar">
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </header>
 
-        <label for="id_bio">Bio:</label>
-        {{ profile_form.bio }}
+    <div class="container">
+        <h2>Edit Profile</h2>
 
-        <label for="id_profile_picture">Profile Picture:</label>
-        {{ picture_form.profile_picture }}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.errors or user_form.errors or profile_form.errors or role_form.errors %}
+            <div class="error-container">
+                <div class="error-message">
+                    <img src="{% static 'icons/alert-icon.svg' %}" alt="Alert" class="alert-icon" onerror="this.src='{% static "images/default-avatar.png" %}'; this.onerror=null;">
+                    <div class="error-text">
+                        {% for field, errors in user_form.errors.items %}
+                            {% for error in errors %}
+                                <p>{{ field|title }}: {{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for field, errors in profile_form.errors.items %}
+                            {% for error in errors %}
+                                <p>{{ field|title }}: {{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for field, errors in role_form.errors.items %}
+                            {% for error in errors %}
+                                <p>{{ field|title }}: {{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
-        <button type="submit">Save Changes</button>
-    </form>
+            <div class="form-group author-info">
+                <div class="profile-icon">
+                    {% if request.user.profile_picture %}
+                    <img src="{{ request.user.profile_picture.url }}" alt="Profile Avatar" class="author-avatar">
+                    {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar" class="author-avatar">
+                    {% endif %}
+                </div>
+                <span class="value">{{ request.user.username }}</span>
+            </div>
 
-    <a href="{% url 'profile_view' %}"><button>Cancel</button></a>
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                {{ user_form.username }}
+                {% if user_form.username.errors %}
+                <div class="field-error">
+                    {% for error in user_form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_bio">Bio</label>
+                {{ profile_form.bio }}
+                {% if profile_form.bio.errors %}
+                <div class="field-error">
+                    {% for error in profile_form.bio.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_profile_picture">Current Profile Picture</label>
+                <div class="profile-picture-preview">
+                    {% if request.user.profile_picture %}
+                    <img src="{{ request.user.profile_picture.url }}" alt="Current Profile Picture" class="current-picture">
+                    {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" alt="Default Profile Picture" class="current-picture">
+                    {% endif %}
+                </div>
+                {{ user_form.profile_picture }}
+                {% if user_form.profile_picture.errors %}
+                <div class="field-error">
+                    {% for error in user_form.profile_picture.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                {% if role == 'student' %}
+                <div class="form-group half-width">
+                    <label for="id_grade_level">Grade Level</label>
+                    {{ role_form.grade_level }}
+                    {% if role_form.grade_level.errors %}
+                    <div class="field-error">
+                        {% for error in role_form.grade_level.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="form-group half-width">
+                    <label for="id_subject_category">Subject Category</label>
+                    {{ role_form.subject_category }}
+                    {% if role_form.subject_category.errors %}
+                    <div class="field-error">
+                        {% for error in role_form.subject_category.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <button type="submit">Save Changes</button>
+        </form>
+
+        <a href="{% url 'profile_view' %}" class="cancel-link">Cancel</a>
+    </div>
+
+    <a href="{% url 'profile_view' %}" class="back-button">
+        <img src="{% static 'icons/back-icon.svg' %}" alt="Back" class="back-icon">
+        Back to Profile
+    </a>
+
+    <script src="{% static 'js/animated-bg.js' %}"></script>
+    <script>
+        // Pass static URLs to JavaScript
+        const ICONS = {
+            book: "{% static 'icons/login/book-bg.svg' %}",
+            boook: "{% static 'icons/login/book-2-bg.svg' %}",
+            map: "{% static 'icons/login/map-bg.svg' %}",
+            maap: "{% static 'icons/login/map-2-bg.svg' %}",
+            pen: "{% static 'icons/login/pen-bg.svg' %}",
+            glasses: "{% static 'icons/login/glasses-bg.svg' %}"
+        };
+    </script>
 </body>
 
 </html>

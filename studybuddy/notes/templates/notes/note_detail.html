@@ -16,21 +16,35 @@
         <!-- will be Passed throw js -->
     </div>
     <!-- Static Navbar -->
-    <header class="site-header">
+    <header id="site-header">
         <div class="logo-container">
             <a href="{% url 'notes_list' %}">
-             <img src="{% static 'images/logo-2-trans.png' %}" alt="Study Buddy Logo" class="site-logo">
+                <img src="{% static 'images/logo-2-trans.png' %}" alt="Study Buddy Logo" class="site-logo">
             </a>
         </div>
-        <h1 class="site-title">Study Buddy</h1>
-        <div class="profile-icon-container">
-            <a href="{% url 'profile_view' %}">
-                {% if request.user.profile_picture %}
-                <img src="{{ request.user.profile_picture.url }}" alt="Profile Avatar" class="author-avatar">
-                {% else %}
-                <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar" class="author-avatar">
-                {% endif %}
+        <a href="{% url 'notes_list' %}">
+            <h1 class="site-title">Study Buddy</h1>
+        </a>
+        <div class="header-actions">
+            <a href="{% url 'notifications' %}">
+                <div class="loader">
+                    <img src="{% static 'icons/notify.svg' %}" alt="Notifications Icon">
+                    {% if has_unseen_notifications %}
+                    <div class="point"></div>
+                    {% endif %}                    
+                </div>
             </a>
+            <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+    
+            <div class="profile-icon-container">
+                <a href="{% url 'profile_view' %}">
+                    {% if request.user.profile_picture %}
+                    <img src="{{ request.user.profile_picture.url }}" alt="Profile Avatar" class="author-avatar">
+                    {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar" class="author-avatar">
+                    {% endif %}
+                </a>
+            </div>
         </div>
     </header>
 
