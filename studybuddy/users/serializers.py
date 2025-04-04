@@ -6,7 +6,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'password', 'role', 'subject_category', 'grade_level', 'bio', 'profile_picture']
+        profile_picture = serializers.ImageField(required=False)
+        fields = ['id', 'username', 'email', 'password', 'role', 'subject_category', 'grade_level', 'profile_picture']
     
     def create(self, validated_data):
         user = CustomUser.objects.create_user(
@@ -16,17 +17,24 @@ class UserSerializer(serializers.ModelSerializer):
             role=validated_data['role'],
             subject_category=validated_data.get('subject_category', None),
             grade_level=validated_data.get('grade_level', None),
-            bio=validated_data.get('bio', ''),
             profile_picture=validated_data.get('profile_picture', None),
         )
         return user
+    def validate(self, data):
+        role = data.get('role')
+        subject = data.get('subject_category')
+        grade = data.get('grade_level')
 
-from rest_framework import serializers
-from .models import CustomUser
+        if role == 'student' and subject:
+            raise serializers.ValidationError("Students should not have a subject category.")
+        if role == 'teacher' and grade:
+            raise serializers.ValidationError("Teachers should not have a grade level.")
+        return data
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
+        profile_picture = serializers.ImageField(required=False)
         fields = ['username', 'profile_picture', 'grade_level', 'subject_category']
 
     def validate(self, data):

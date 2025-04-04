@@ -8,6 +8,8 @@ from django.contrib import messages
 from notifications.models import Notification
 from .models import Note
 from notifications.views import has_unseen_notifications
+from django.http import JsonResponse
+import json
 
 @login_required
 def notes_list(request):
@@ -114,22 +116,30 @@ def like_note(request, note_id):
     """ Toggle like on a note and notify the author """
     note = get_object_or_404(Note, id=note_id)
     like, created = Like.objects.get_or_create(user=request.user, note=note)
+    user_has_disliked = False
 
     if not created:
         like.delete()
+        user_has_liked = False
     else:
         Dislike.objects.filter(user=request.user, note=note).delete()
+        user_has_liked = True
 
         if note.author != request.user:
             Notification.objects.create(
-                recipient=note.author,  # **Receiver (Note's Author)**
-                sender=request.user,  # **Who liked the note**
+                recipient=note.author,
+                sender=request.user,
                 note=note,
                 notification_type="like",
                 message = f"{request.user.username} liked your note: {note.title}."
             )
 
-    return redirect('note_detail', note_id=note.id)
+    return JsonResponse({
+        'likes': note.likes.count(),
+        'dislikes': note.dislikes.count(),
+        'user_has_liked': user_has_liked,
+        'user_has_disliked': user_has_disliked
+    })
 
 
 
@@ -137,43 +147,65 @@ def like_note(request, note_id):
 def dislike_note(request, note_id):
     """ Toggle dislike on a note """
     note = get_object_or_404(Note, id=note_id)
-    dislike, created = Dislike.objects.get_or_create(
-        user=request.user, note=note)
+    dislike, created = Dislike.objects.get_or_create(user=request.user, note=note)
+    user_has_liked = False
 
     if not created:
-        dislike.delete()  #
+        dislike.delete()
+        user_has_disliked = False
     else:
         Like.objects.filter(user=request.user, note=note).delete()
+        user_has_disliked = True
         if note.author != request.user:
             Notification.objects.create(
-                recipient=note.author, 
-                sender=request.user,  
+                recipient=note.author,
+                sender=request.user,
                 note=note,
                 notification_type="dislike",
                 message = f"{request.user.username} disliked your note: {note.title}."
             )
 
-    return redirect('note_detail', note_id=note.id)
+    return JsonResponse({
+        'likes': note.likes.count(),
+        'dislikes': note.dislikes.count(),
+        'user_has_liked': user_has_liked,
+        'user_has_disliked': user_has_disliked
+    })
 
 
 @login_required
 def add_comment(request, note_id):
     """ Add a comment to a note """
     note = get_object_or_404(Note, id=note_id)
-    content = request.POST.get('content')
-
-    if content:
-        Comment.objects.create(user=request.user, note=note,content=content)
-        if note.author != request.user:
-            Notification.objects.create(
-                recipient=note.author,
-                sender=request.user,
-                note=note,
-                notification_type="comment",
-                message = f"{request.user.username} commented your note: {note.title}."
-            )
-
-    return redirect('note_detail', note_id=note.id)
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            content = data.get('content')
+            
+            if content:
+                comment = Comment.objects.create(user=request.user, note=note, content=content)
+                if note.author != request.user:
+                    Notification.objects.create(
+                        recipient=note.author,
+                        sender=request.user,
+                        note=note,
+                        notification_type="comment",
+                        message=f"{request.user.username} commented your note: {note.title}."
+                    )
+                
+                return JsonResponse({
+                    'success': True,
+                    'id': comment.id,
+                    'content': comment.content,
+                    'author': comment.user.username,
+                    'user_avatar': comment.user.profile_picture.url if comment.user.profile_picture else None,
+                    'created_at': comment.created_at.strftime("%b %d, %Y %I:%M %p")
+                })
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON data'}, status=400)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method or no content provided'}, status=400)
 
 
 @login_required
@@ -181,36 +213,40 @@ def add_reply(request, note_id, comment_id):
     """ Add a reply to a comment """
     note = get_object_or_404(Note, id=note_id)
     parent_comment = get_object_or_404(Comment, id=comment_id, note=note)
-    content = request.POST.get('content')
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            content = data.get('content')
 
-    if content:
-        # Create a reply and associate it with the parent comment
-        Comment.objects.create(
-            user=request.user,
-            note=note,
-            parent=parent_comment,
-            content=content
-        )
-        if parent_comment.user != request.user:
-            Notification.objects.create(
-                recipient=parent_comment.user,
-                sender=request.user,
-                note=note,
-                notification_type="comment",
-                message = f"{request.user.username} replied on your comment on this note: {note.title}."
-            )
-        
-        if parent_comment.user != request.user and note.author != request.user:
-            Notification.objects.create(
-                recipient=note.author,
-                sender=request.user,
-                note=note,
-                notification_type="comment",
-                message = f"{request.user.username} commented your note: {note.title}."
-            )
-
-
-    return redirect('note_detail', note_id=note.id)
+            if content:
+                reply = Comment.objects.create(
+                    user=request.user,
+                    note=note,
+                    parent=parent_comment,
+                    content=content
+                )
+                if parent_comment.user != request.user:
+                    Notification.objects.create(
+                        recipient=parent_comment.user,
+                        sender=request.user,
+                        note=note,
+                        notification_type="comment",
+                        message=f"{request.user.username} replied on your comment on this note: {note.title}."
+                    )
+                
+                return JsonResponse({
+                    'success': True,
+                    'id': reply.id,
+                    'content': reply.content,
+                    'author': reply.user.username,
+                    'user_avatar': reply.user.profile_picture.url if reply.user.profile_picture else None,
+                    'created_at': reply.created_at.strftime("%b %d, %Y %I:%M %p")
+                })
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON data'}, status=400)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method or no content provided'}, status=400)
 
 def filter_notes(request, notes):
     grade_filter = request.GET.get('grade_level', '')

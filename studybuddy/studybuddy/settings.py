@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'notes',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
 
 ]
 REST_FRAMEWORK = {
@@ -59,7 +60,7 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
-    "ALGORITHM": "HS256",  # Default is HS256, but you can use RS256 for more security
+    "ALGORITHM": "HS256", 
 }
 
 

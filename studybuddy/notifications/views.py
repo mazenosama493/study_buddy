@@ -19,7 +19,7 @@ def notifications_view(request):
 
 @login_required
 def mark_notifications_as_seen(request):
-    Notification.objects.filter(recipient=request.user).update(seen=True, is_read=True)
+    Notification.objects.filter(recipient=request.user).update(seen=True)
     if request.method == 'POST':
         Notification.objects.filter(recipient=request.user).update(seen=True)
     return redirect('notifications')

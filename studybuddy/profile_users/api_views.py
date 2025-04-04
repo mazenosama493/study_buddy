@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import ProfileSerializer, FollowSerializer
 from django.contrib.auth import get_user_model
 
+
 User = get_user_model()
 
 # Profile List and Detail Views
@@ -25,7 +26,7 @@ class FollowUserAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
-        """ API for following a user """
+        """API for following a user"""
         try:
             following = User.objects.get(id=user_id)
         except User.DoesNotExist:
@@ -38,37 +39,26 @@ class FollowUserAPIView(APIView):
         # Check if follow already exists
         follow, created = Follow.objects.get_or_create(follower=request.user, following=following)
 
-        if created:
-            return Response({"status": "success", "message": "Follow request sent"}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({"status": "info", "message": "Already following"}, status=status.HTTP_200_OK)
-    
+        if not created:
+            return Response({"status": "info", "message": "Already following or pending"}, status=status.HTTP_200_OK)
+
+        # Check if recipient has a profile and whether it's public or private
+        try:
+            recipient_profile = following.profile
+            if  recipient_profile.public_profile:
+                follow.status = "accepted"
+                follow.save()
+                return Response({"status": "success", "message": "You are now following the user"}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"status": "success", "message": "Follow request sent and is awaiting approval"}, status=status.HTTP_201_CREATED)
+        except Profile.DoesNotExist:
+            return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
     def delete(self, request, user_id):
-        """ API for unfollowing a user """
+        """API for unfollowing a user"""
         try:
             follow = Follow.objects.get(follower=request.user, following_id=user_id)
             follow.delete()
             return Response({"status": "success", "message": "Unfollowed successfully"}, status=status.HTTP_200_OK)
         except Follow.DoesNotExist:
             return Response({"error": "Follow relationship does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-    def delete(self, request, user_id):
-        """ API for unfollowing a user """
-        try:
-            follow = Follow.objects.get(follower=user_id.user, following_id=request.user.id)
-            follow.delete()
-            return Response({"status": "success", "message": "Unfollowed successfully"}, status=status.HTTP_200_OK)
-        except Follow.DoesNotExist:
-            return Response({"error": "Follow relationship does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-
-class RemoveFollowerAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def delete(self, request, user_id):
-        """ API for removing a follower """
-        try:
-            follow = Follow.objects.get(follower_id=user_id, following=request.user)
-            follow.delete()
-            return Response({"status": "success", "message": "Follower removed successfully"}, status=status.HTTP_200_OK)
-        except Follow.DoesNotExist:
-            return Response({"error": "This user is not following you"}, status=status.HTTP_400_BAD_REQUEST)
-

@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import profile_view, edit_profile, public_profile_view, follow_user, accept_follow_request, reject_follow_request, remove_follower, toggle_profile_privacy, cancel_follow_request, unfollow_user
-from .api_views import ProfileListCreateView, ProfileDetailView, FollowUserAPIView, RemoveFollowerAPIView
+from .api_views import ProfileListCreateView, ProfileDetailView, FollowUserAPIView
 
 urlpatterns = [
     path('', profile_view, name='profile_view'),
@@ -16,5 +16,4 @@ urlpatterns = [
     path('api/profiles/', ProfileListCreateView.as_view(), name='api_profiles'),
     path('api/profiles/<int:pk>/', ProfileDetailView.as_view(), name='api_profile_detail'),
     path('api/follow/<int:user_id>/', FollowUserAPIView.as_view(), name='follow_user_api'),
-    path('api/remove-follower/<int:user_id>/', RemoveFollowerAPIView.as_view(), name='remove_follower_api'),
 ]

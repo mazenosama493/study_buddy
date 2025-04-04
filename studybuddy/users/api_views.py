@@ -10,13 +10,14 @@ class RegisterUserView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
+    parser_classes = (MultiPartParser, FormParser)
+    
 
 
-class ProfileUpdateAPIView(generics.UpdateAPIView):
-    """ API to update profile picture, username, grade level (students), and subject category (teachers) """
+class ProfileUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProfileUpdateSerializer
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = (MultiPartParser, FormParser)  # Allow image uploads
+    parser_classes = (MultiPartParser, FormParser) 
 
     def get_object(self):
         """ Ensure users can only update their own profile """

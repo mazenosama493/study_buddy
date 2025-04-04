@@ -8,6 +8,9 @@
     <link rel="icon" type="image/png" href="{% static 'images/fav32.png' %}">
     <link rel="stylesheet" href="{% static 'css/notes/note_detail.css' %}">
     <link rel="stylesheet" href="{% static 'css/root.css' %}">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="{% static 'js/ajax_handlers.js' %}"></script>
+    <script src="{% static 'js/init_handlers.js' %}"></script>
     <title>{{ note.title }}</title>
 </head>
 
@@ -31,11 +34,11 @@
                     <img src="{% static 'icons/notify.svg' %}" alt="Notifications Icon">
                     {% if has_unseen_notifications %}
                     <div class="point"></div>
-                    {% endif %}                    
+                    {% endif %}
                 </div>
             </a>
             <a href="{% url 'logout' %}" class="logout-button">Logout</a>
-    
+
             <div class="profile-icon-container">
                 <a href="{% url 'profile_view' %}">
                     {% if request.user.profile_picture %}
@@ -101,25 +104,19 @@
             </div>
 
             <div class="note-actions">
-                <form method="POST" action="{% url 'like_note' note.id %}" class="action-form">
-                    {% csrf_token %}
-                    <button type="submit" class="action-button like-button">
-                        <img src="{% static 'icons/heart-likes.svg' %}" alt="Like" class="action-icon">
-                        <span>{{ note.likes.count }}</span>
-                    </button>
-                </form>
-                <form method="POST" action="{% url 'dislike_note' note.id %}" class="action-form">
-                    {% csrf_token %}
-                    <button type="submit" class="action-button dislike-button">
-                        <img src="{% static 'icons/dislike-icon.svg' %}" alt="Dislike" class="action-icon">
-                        <span>{{ note.dislikes.count }}</span>
-                    </button>
-                </form>
+                <button type="button" class="action-button like-button" id="like-button-{{ note.id }}">
+                    <img src="{% static 'icons/heart-likes.svg' %}" alt="Like" class="action-icon">
+                    <span id="like-count-{{ note.id }}">{{ note.likes.count }}</span>
+                </button>
+                <button type="button" class="action-button dislike-button" id="dislike-button-{{ note.id }}">
+                    <img src="{% static 'icons/dislike-icon.svg' %}" alt="Dislike" class="action-icon">
+                    <span id="dislike-count-{{ note.id }}">{{ note.dislikes.count }}</span>
+                </button>
             </div>
 
             <div class="comments-section">
                 <h3 class="comments-title">Comments</h3>
-                <form method="POST" action="{% url 'add_comment' note.id %}" class="comment-form">
+                <form class="comment-form" data-note-id="{{ note.id }}">
                     {% csrf_token %}
                     <div class="comment-input-container">
                         <textarea name="content" placeholder="Write a comment..." required
@@ -133,17 +130,20 @@
                     <div class="comment">
                         <div class="comment-header">
                             {% if comment.user.profile_picture %}
-                            <img src="{{ comment.user.profile_picture.url }}" alt="Commenter Avatar" class="commenter-avatar">
+                            <img src="{{ comment.user.profile_picture.url }}" alt="Commenter Avatar"
+                                class="commenter-avatar">
                             {% else %}
-                            <img src="{% static 'images/default-avatar.png' %}" alt="Commenter Avatar" class="commenter-avatar">
+                            <img src="{% static 'images/default-avatar.png' %}" alt="Commenter Avatar"
+                                class="commenter-avatar">
                             {% endif %}
                             <span class="commenter-name">{{ comment.user.username }}</span>
                         </div>
                         <p class="comment-content">{{ comment.content }}</p>
-                        <form method="POST" action="{% url 'add_reply' note.id comment.id %}" class="reply-form">
+                        <form class="reply-form" data-note-id="{{ note.id }}" data-comment-id="{{ comment.id }}">
                             {% csrf_token %}
                             <div class="reply-input-container">
-                                <textarea name="content" placeholder="Write a reply..." required class="reply-input"></textarea>
+                                <textarea name="content" placeholder="Write a reply..." required
+                                    class="reply-input"></textarea>
                                 <button type="submit" class="submit-reply">Reply</button>
                             </div>
                         </form>
@@ -151,9 +151,11 @@
                         <div class="reply">
                             <div class="reply-header">
                                 {% if reply.user.profile_picture %}
-                                <img src="{{ reply.user.profile_picture.url }}" alt="Replier Avatar" class="replier-avatar">
+                                <img src="{{ reply.user.profile_picture.url }}" alt="Replier Avatar"
+                                    class="replier-avatar">
                                 {% else %}
-                                <img src="{% static 'images/default-avatar.png' %}" alt="Replier Avatar" class="replier-avatar">
+                                <img src="{% static 'images/default-avatar.png' %}" alt="Replier Avatar"
+                                    class="replier-avatar">
                                 {% endif %}
                                 <span class="replier-name">{{ reply.user.username }}</span>
                             </div>
@@ -175,6 +177,7 @@
     </a>
     <script src="{% static 'js/notes/note_detail.js' %}"></script>
     <script src="{% static 'js/animated-bg.js' %}"></script>
+
     <script>
         // Pass static URLs to JavaScript
         const ICONS = {

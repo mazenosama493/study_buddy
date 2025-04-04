@@ -1,4 +1,22 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Remove event listeners from init-handlers.js to prevent duplicate bindings
+  document
+    .querySelectorAll(".like-button, .dislike-button")
+    .forEach((button) => {
+      const clone = button.cloneNode(true);
+      button.parentNode.replaceChild(clone, button);
+    });
+
+  document.querySelectorAll(".comment-form").forEach((form) => {
+    const clone = form.cloneNode(true);
+    form.parentNode.replaceChild(clone, form);
+  });
+
+  document.querySelectorAll(".reply-form").forEach((form) => {
+    const clone = form.cloneNode(true);
+    form.parentNode.replaceChild(clone, form);
+  });
+
   const MAX_VISIBLE_COMMENTS = 2;
   const MAX_VISIBLE_REPLIES = 1;
 
