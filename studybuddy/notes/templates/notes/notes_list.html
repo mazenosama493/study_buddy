@@ -95,11 +95,13 @@
             <div class="note-card">
                 <div class="note-header">
                     <!-- Avatar -->
-                    {% if note.author.profile_picture %}
                     <a href="{% url 'public_profile' note.author.username %}">
+                        {% if note.author.profile_picture %}
                         <img src="{{ note.author.profile_picture.url }}" alt="Author Avatar" class="author-avatar">
                         {% else %}
+                        
                         <img src="{% static 'images/default-avatar.png' %}" alt="Profile Avatar" class="author-avatar">
+                        
                         {% endif %}
                     </a>
                     <!-- Author Info -->
