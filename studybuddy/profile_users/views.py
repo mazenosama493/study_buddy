@@ -40,7 +40,7 @@ def public_profile_view(request, username):
     if is_following:
         notes = user.note_set.all().order_by('-created_at')
     else:
-        notes = user.note_set.filter(show_on_profile=True).order_by('-created_at') # Show only public notes
+        notes = user.note_set.filter(show_on_profile=False).order_by('-created_at') # Show only public notes
 
     # Redirect to own profile if user is viewing themselves
     if user == request.user:
