@@ -69,7 +69,7 @@ A collaborative learning platform connecting students and teachers, facilitating
 
 - Django (Python web framework)
 - Django REST Framework for API endpoints
-- SQLite database (default)
+- MySql
 - ASGI/WSGI support for deployment
 
 ### 🎯 Frontend
