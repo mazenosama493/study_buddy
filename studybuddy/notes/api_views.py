@@ -61,26 +61,6 @@ class CommentListCreateView(generics.ListCreateAPIView):
         serializer.save(user=user)
 
 
-class NoteCommentListView(generics.ListAPIView):
-    serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        note_id = self.kwargs.get("note_id")
-        user = self.request.user
-
-        try:
-            note = Note.objects.get(id=note_id)
-        except Note.DoesNotExist:
-            raise PermissionDenied("Note not found.")
-
-        if note.show_on_profile:
-            if note.author != user:
-                if not Follow.objects.filter(follower=user, following=note.author).exists():
-                    raise PermissionDenied("You are not allowed to view this note comments.")
-
-        return Comment.objects.filter(note=note).order_by('-created_at')
-
 
 # Like API
 class LikeCreateDeleteView(generics.CreateAPIView):
